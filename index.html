@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>בס"ד | הלקוחות והספקים שלי</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Heebo:wght@300;400;500;600&family=Noto+Serif+Hebrew:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{--bg:#fff;--card:#fff;--tile:#f6f2eb;--sand:#ede8e1;--ink:#1f2430;--mute:#8c8173;--pri:#b89a6a;--btn:#1f2430;--onbtn:#fff;--red:#b45353;--grn:#2f6b55;--line:#e6dccb;--sh:0 14px 36px rgba(31,36,48,.06);--hd:'Cormorant Garamond','Noto Serif Hebrew',serif;--bd:'Heebo','Assistant',Arial,sans-serif;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--bd);font-weight:400;font-size:16px;min-height:100vh}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:10}
+button,input,select,textarea{font-family:var(--bd)}
+.wrap{max-width:720px;margin:0 auto;padding:14px 16px 130px}
+.bsd{font-family:var(--hd);font-weight:700;font-size:18px;color:var(--pri);letter-spacing:.12em}
+.top{display:flex;justify-content:flex-start;align-items:flex-start;gap:12px}
+.hi{display:flex;gap:10px;align-items:center;margin-top:4px}
+.av{width:46px;height:46px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font:600 19px var(--hd);border:0;cursor:pointer}
+.hi b{font:600 21px var(--hd);display:block;letter-spacing:.01em}.hi small{color:var(--mute);font-size:13px;font-weight:300}
+h1{font:600 32px/1.15 var(--hd);margin:20px 0 4px;display:flex;align-items:center;gap:10px;letter-spacing:.005em}
+h1 svg{color:var(--pri)}
+.sub{color:var(--mute);font-size:14px;font-weight:300;letter-spacing:.04em;margin:0 0 16px}
+.search{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:0 16px;height:52px;color:var(--mute)}
+.search:focus-within{border-color:var(--pri)}
+.search input{flex:1;border:0;background:none;font:inherit;color:var(--ink);outline:none;min-width:0;margin:0;padding:0;width:auto}
+.row{display:flex;gap:8px;margin:14px 0;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:#fff;color:var(--ink);font:400 14px var(--bd);padding:9px 16px;border-radius:999px;cursor:pointer;transition:.15s}
+.chip:hover{border-color:var(--pri);color:var(--pri)}
+.chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.chip:focus-visible,.btn:focus-visible,.act:focus-visible,.item:focus-visible,.tab:focus-visible,.vsw:focus-visible{outline:2px solid var(--pri);outline-offset:2px}
+.sp{flex:1}
+.item{display:flex;align-items:center;gap:12px;width:100%;text-align:start;background:var(--card);border-radius:22px;padding:14px;margin-bottom:10px;box-shadow:var(--sh);border:1px solid var(--line);cursor:pointer;color:var(--ink);font:inherit;transition:.15s}
+.item:hover{border-color:var(--pri)}
+.ic{width:46px;height:46px;border-radius:14px;background:var(--bg);border:1px solid var(--line);color:var(--pri);display:grid;place-items:center;flex:none}
+.item .n{flex:1;min-width:0}.item .n b{display:block;font-weight:500;font-size:16px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item .n small{color:var(--mute);font-size:12.5px;font-weight:300}
+.amt,.big .v,.g2 .v,.st .v{font-family:var(--hd);font-feature-settings:"lnum","tnum";font-variant-numeric:lining-nums tabular-nums}
+.amt{font-weight:700;font-size:18px;direction:ltr;white-space:nowrap}
+.neg{color:var(--red)}.pos{color:var(--ink)}
+.chev{color:var(--mute);flex:none}
+.empty{text-align:center;color:var(--mute);padding:40px 10px;line-height:1.8;font-weight:300}
+.fab{position:fixed;inset-inline:0;bottom:calc(14px + env(safe-area-inset-bottom,0px));display:flex;justify-content:center;flex-wrap:wrap;gap:8px;z-index:5;pointer-events:none;padding:0 12px}.fab .btn{pointer-events:auto;padding:12px 18px}
+.btn{border:1px solid var(--ink);font:500 14px var(--bd);letter-spacing:.04em;border-radius:999px;padding:13px 22px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;background:var(--btn);color:var(--onbtn);box-shadow:0 10px 24px rgba(31,36,48,.14);transition:.15s}
+.btn:hover{background:var(--pri);border-color:var(--pri);color:var(--ink)}
+.btn.sec{background:#fff;color:var(--ink);border:1px solid var(--line);box-shadow:none}
+.btn.sec:hover{border-color:var(--pri);color:var(--pri);background:#fff}
+.btn.danger{background:var(--red);border-color:var(--red);color:#fff}
+.back{background:none;border:0;color:var(--mute);cursor:pointer;padding:6px 0;font:400 14px var(--bd);display:flex;align-items:center;gap:4px;margin-top:6px}
+.back:hover{color:var(--pri)}
+.hd{text-align:center;margin-top:6px}
+.hd .ic{margin:0 auto 10px;width:58px;height:58px;border-radius:18px}
+.hd h2{font:600 28px/1.2 var(--hd);margin:0 0 4px}
+.hd small{color:var(--mute);font-size:14px;font-weight:300}
+.tabs{display:flex;gap:6px;background:var(--sand);border-radius:999px;padding:5px;margin:16px 0;overflow:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:1;border:0;background:none;font:500 14px var(--bd);padding:10px 18px;border-radius:999px;cursor:pointer;color:var(--mute);white-space:nowrap;transition:.15s}
+.tab.on{background:var(--ink);color:#fff}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;margin-bottom:12px;box-shadow:var(--sh)}
+.big{display:flex;gap:14px;align-items:center}
+.big .ic{width:50px;height:50px}
+.big small{color:var(--mute);display:block;font-size:13px;font-weight:300}
+.big .v{font-size:38px;font-weight:700;direction:ltr;text-align:start;line-height:1.1}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g2 .card{margin:0}.g2 small{color:var(--mute);font-size:13px;font-weight:300;display:block}.g2 .v{font-weight:700;font-size:26px;margin-top:6px}
+.acts{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0}
+.act{position:relative;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:18px;padding:13px 4px;font:500 12.5px var(--bd);display:flex;flex-direction:column;align-items:center;gap:7px;cursor:pointer;text-align:center;transition:.15s}
+.act:hover{border-color:var(--pri)}
+.act svg{color:var(--pri)}.act.wa svg{color:var(--grn)}
+.act i{position:absolute;top:6px;inset-inline-end:8px;background:var(--red);color:#fff;font:600 11px var(--bd);font-style:normal;min-width:18px;height:18px;border-radius:9px;display:grid;place-items:center;padding:0 5px}
+.tg{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:6px}
+.dc{display:flex;align-items:center;gap:10px;padding:12px 0;border-top:1px solid var(--line)}.dc:first-child{border:0}.dc .n{flex:1;min-width:0}.dc b{display:block;font-weight:500}.dc small{color:var(--mute);font-weight:300}
+.mini{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:50%;width:36px;height:36px;display:grid;place-items:center;cursor:pointer;flex:none;font-size:15px;transition:.15s}
+.mini:hover{border-color:var(--pri);color:var(--pri)}
+.tag{display:inline-block;font-size:12px;border-radius:999px;padding:2px 10px;background:var(--sand);color:var(--mute);margin-inline-start:6px}
+.tag.ok{background:#e3efe9;color:var(--grn)}
+.login{max-width:380px;margin:6vh auto 0}.login .tab{flex:1}
+.tools{margin-inline-start:auto;display:flex;gap:8px;align-items:center}
+.bell{position:relative;border:1px solid var(--line);background:#fff;color:var(--ink);width:44px;height:44px;border-radius:50%;display:grid;place-items:center;cursor:pointer}
+.bell i{position:absolute;top:-4px;inset-inline-end:-4px;background:var(--red);color:#fff;font:600 12px var(--bd);font-style:normal;min-width:20px;height:20px;border-radius:10px;display:grid;place-items:center;padding:0 5px}
+.bell:focus-visible{outline:2px solid var(--pri);outline-offset:2px}
+.vsw{display:inline-flex;align-items:center;background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px;cursor:pointer;font:400 12.5px var(--bd);color:var(--mute)}
+.vsw span{display:inline-flex;align-items:center;gap:5px;padding:7px 11px;border-radius:999px;transition:.15s}
+.vsw span.on{background:var(--ink);color:#fff}
+.vsw svg{width:16px;height:16px}
+.chk{display:flex;align-items:center;gap:10px;margin-top:14px;color:var(--ink);font-size:15px}.chk input{width:20px;height:20px;margin:0;accent-color:var(--ink)}
+.gh{font-size:12.5px;color:var(--mute);margin:18px 0 8px;font-weight:500;letter-spacing:.08em}
+dl{margin:0}dt{color:var(--mute);font-size:13px;font-weight:300;margin-top:14px}dd{margin:2px 0 0;font-size:16px;font-weight:400;overflow-wrap:anywhere}
+dd a{color:var(--pri);text-decoration:none;direction:ltr;unicode-bidi:plaintext}
+.tw{overflow-x:auto;border-radius:18px;background:var(--card);border:1px solid var(--line)}
+table{border-collapse:collapse;width:100%;min-width:520px;font-size:14px}
+th{background:var(--bg);color:var(--mute);text-align:start;padding:11px 10px;font-weight:500;white-space:nowrap}
+td{padding:11px 10px;border-top:1px solid var(--line)}
+td.n{font-family:var(--hd);font-weight:600;font-size:15px;font-feature-settings:"lnum","tnum";direction:ltr;text-align:end;white-space:nowrap}
+tfoot td{font-weight:600;background:var(--bg)}
+.bar{display:flex;align-items:center;gap:10px;margin:12px 0}.bar span:first-child{width:90px;font-size:13px;color:var(--mute);flex:none}
+.bar i{display:block;height:10px;border-radius:6px;background:var(--pri);min-width:3px}.bar .tr{flex:1;background:var(--sand);border-radius:6px;overflow:hidden}
+.bar b{font-family:var(--hd);font-weight:600;font-size:15px;direction:ltr;min-width:84px;text-align:end}
+.prog{height:6px;border-radius:3px;background:var(--sand);overflow:hidden;margin:6px 0 10px}.prog i{display:block;height:100%;width:0;background:var(--pri);transition:width .3s}
+.thumb{width:46px;height:46px;border-radius:14px;object-fit:cover;flex:none;border:1px solid var(--line)}
+dialog{border:1px solid var(--line);border-radius:26px;background:#fff;color:var(--ink);width:min(92vw,520px);padding:22px;font-family:var(--bd);max-height:90vh;box-shadow:0 30px 80px rgba(31,36,48,.22)}
+dialog::backdrop{background:rgba(31,36,48,.42)}
+dialog h3{margin:0 0 12px;font:600 26px var(--hd)}
+label{display:block;font-size:13px;color:var(--mute);font-weight:400;margin-top:12px}
+input,select,textarea{width:100%;margin-top:4px;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:#fff;color:var(--ink);font:inherit;font-size:15px}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--pri)}
+.dl{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap}
+.hint{font-size:13.5px;color:var(--mute);line-height:1.75;font-weight:300}
+.toast{position:fixed;bottom:calc(90px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 20px;border-radius:999px;font-size:14px;z-index:30;opacity:0;pointer-events:none;transition:opacity .25s;max-width:90vw;text-align:center}
+.toast.show{opacity:1}
+.st{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}.st .card{margin:0;padding:12px 14px}.st small{color:var(--mute);font-size:12px;font-weight:300;display:block}.st .v{font-size:20px;font-weight:700;margin-top:4px;direction:ltr;text-align:start}
+#print{display:none}
+@media print{body>*:not(#print){display:none!important}#print{display:block;color:#000;background:#fff;font-size:12px;padding:10mm}#print table{min-width:0;font-size:11px}#print th{background:#eee}#print td,#print th{border:1px solid #bbb;padding:5px}#print h2{margin:4px 0}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (max-width:420px){.vsw span{padding:7px 9px}.acts{gap:8px}.act{font-size:12px}}
+.mob body{background:#fff}.mob .wrap{max-width:430px;background:#fff;min-height:100vh;box-shadow:0 0 0 1px var(--line)}
+.qa{grid-template-columns:repeat(5,1fr);gap:8px}.qa .act{font-size:11.5px;padding:12px 2px}a.btn{text-decoration:none}
+.desk .wrap{max-width:1120px}.desk #lst{display:grid;grid-template-columns:1fr 1fr;gap:12px}.desk #lst .item{margin:0}.desk .g2{grid-template-columns:repeat(3,1fr)}.desk .acts{grid-template-columns:repeat(4,minmax(0,200px))}.desk .qa{grid-template-columns:repeat(5,minmax(0,200px))}.desk .tg{grid-template-columns:repeat(4,1fr)}.desk dialog{width:min(92vw,660px)}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<div class="fab" id="fab"></div>
+<div class="toast" id="toast"></div>
+<div id="print"></div>
+<dialog id="dlg"></dialog>
+<input type="file" id="file" accept=".xlsx,.xls,.csv" multiple hidden>
+
+<script>
+const $=s=>document.querySelector(s);
+const I={
+ bld:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v16M15 9h3a2 2 0 0 1 2 2v10M3 21h18M8 7h3M8 11h3M8 15h3"/></svg>',
+ usr:'<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.5-3.5 3-5.5 6.5-5.5s6 2 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c2 .6 3.2 2.3 3.5 5"/></svg>',
+ chv:'<svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg>',
+ bk:'<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>',
+ wa:'<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.1-1.3A10 10 0 1 0 12 2zm5.2 14.1c-.2.6-1.300 1.200-1.800 1.200-.5.100-1 .2-3.300-.7-2.800-1.100-4.600-4-4.700-4.200-.1-.2-1.100-1.500-1.100-2.800s.7-2 1-2.300c.2-.3.500-.3.700-.3h.5c.2 0 .4 0 .6.500l.8 2c.1.200.1.400 0 .5l-.4.600-.4.400c-.1.200-.3.400-.1.700.2.300.8 1.300 1.700 2.100 1.200 1 2.100 1.300 2.400 1.500.3.100.5.100.6-.1l.9-1.100c.2-.3.400-.2.700-.1l1.900.9c.3.100.5.200.5.400.100.200.100.800-.100 1.400z"/></svg>',
+ ml:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3.500 7.500l8.500 6 8.500-6"/></svg>',
+ pdf:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8zM14 3v5h5M9 13h6M9 17h6"/></svg>',
+ xl:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>',
+ ed:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9a2.800 2.800 0 0 0-4-4L4 16zM13.500 6.500l4 4"/></svg>',
+ db:'<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.700 3.600 3 8 3s8-1.300 8-3V6M4 12v6c0 1.700 3.600 3 8 3s8-1.300 8-3v-6"/></svg>',
+ srt:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 4v16M3 16l4 4 4-4M17 20V4M13 8l4-4 4 4"/></svg>',
+ rt:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h11v10H3zM14 9h4l3 3v4h-7M7 19.5a1.5 1.5 0 1 0 0-.01M17 19.5a1.5 1.5 0 1 0 0-.01"/></svg>',
+ cal:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
+ bar:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 20h16M7 20v-7M12 20V6M17 20v-10"/></svg>',
+ bell:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 17V11a6 6 0 0 1 12 0v6l1.500 2h-15zM10 21h4"/></svg>',
+ mob:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM11 18h2"/></svg>',
+ desk:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>',
+ srch:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>'
+};
+const TODAY=new Date();
+const iso=d=>d.toISOString().slice(0,10);
+const ago=n=>{const d=new Date(TODAY);d.setDate(d.getDate()-n);return iso(d)};
+const fmt=n=>(n<0?'-':'')+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const heDate=s=>{if(!s)return'';const [y,m,d]=String(s).slice(0,10).split('-');return `${d}.${m}.${y}`};
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function demo(){return[
+ {id:'100001',name:'לקוח לדוגמה בע"מ',type:'c',taxId:'',agent:'',phone:'',email:'',address:'',tx:[
+  {d:ago(80),ref:'1001',desc:'חשבונית מס',debit:5000,credit:0,due:ago(50)},
+  {d:ago(30),ref:'1002',desc:'חשבונית מס',debit:3200,credit:0,due:ago(0)},
+  {d:ago(20),ref:'1003',desc:'קבלה',debit:0,credit:2000,due:ago(20)}]},
+ {id:'200001',name:'ספק לדוגמה בע"מ',type:'s',taxId:'',agent:'',phone:'',email:'',address:'',tx:[
+  {d:ago(40),ref:'S-1',desc:'חשבונית ספק',debit:0,credit:4500,due:ago(10)}]}
+]}
+let VM=localStorage.getItem('hs_view')||(innerWidth>900?'desk':'mob');
+function applyView(){document.documentElement.classList.remove('mob','desk');document.documentElement.classList.add(VM)}applyView();
+const vwHtml=()=>`<span class="${VM==='mob'?'on':''}">${I.mob}מובייל</span><span class="${VM==='desk'?'on':''}">${I.desk}מחשב</span>`;
+const viewBtn=()=>`<button class="vsw" id="vw" aria-label="החלפה בין תצוגת מובייל לתצוגת מחשב" title="החלפה בין תצוגת מובייל לתצוגת מחשב">${vwHtml()}</button>`;
+document.addEventListener('click',e=>{if(e.target.closest('#vw')){VM=VM==='desk'?'mob':'desk';try{localStorage.setItem('hs_view',VM)}catch(x){}applyView();document.querySelectorAll('#vw').forEach(b=>{b.innerHTML=vwHtml()});toast(VM==='desk'?'תצוגת מחשב':'תצוגת מובייל')}});
+let S=null,U=null;
+const users=()=>{try{return JSON.parse(localStorage.getItem('hs_users')||'{}')}catch(e){return{}}};
+const SK=()=>'hs_app_'+U;
+function defTpl(){return[
+{id:'t1',name:'תזכורת תשלום עדינה',text:'שלום {איש_קשר},\nתזכורת ידידותית: בחשבון {שם} ({מספר}) רשום חוב בסך {חוב_בפיגור} ₪ שמועד פרעונו עבר.\nנשמח להסדרת התשלום. תודה רבה!\n{שם_משתמש}'},
+{id:'t2',name:'תזכורת תשלום דחופה',text:'שלום {איש_קשר},\nלמרות תזכורות קודמות, טרם התקבל תשלום עבור חוב בסך {חוב_בפיגור} ₪ (יתרה כוללת {יתרה} ₪).\nנבקש להסדיר את התשלום בהקדם.\n{שם_משתמש}'},
+{id:'t3',name:'אישור קבלת תשלום',text:'שלום {איש_קשר},\nתודה! התשלום התקבל. היתרה העדכנית בחשבון היא {יתרה} ₪.\n{שם_משתמש}'},
+{id:'t4',name:'שליחת כרטסת',text:'שלום {איש_קשר},\nכרטסת החשבון של {שם} נכון ל־{תאריך}. היתרה: {יתרה} ₪.\n{שם_משתמש}'},
+{id:'t5',name:'אישור יתרה וקביעת תשלום לספק',text:'שלום {איש_קשר},\nיתרת הספק אצלנו היא {יתרה} ₪. נשמח לאשר ולתאם מועד תשלום.\n{שם_משתמש}'}]}
+function load(){let r=null;try{r=JSON.parse(localStorage.getItem(SK())||'null')}catch(e){}
+ S=r&&r.accts?r:{name:users()[U]?.name||'משתמש',accts:demo()};S.set=Object.assign({od:90,soon:7,bn:false,last:''},S.set);S.rem=S.rem||[];S.tpl=S.tpl||defTpl();S.log=S.log||[]}
+function save(){try{localStorage.setItem(SK(),JSON.stringify(S))}catch(e){}}
+async function hash(p,salt){try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(salt+p));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}catch(e){let h=0;for(const c of salt+p)h=(h*31+c.charCodeAt(0))|0;return'f'+h}}
+function loginView(mode='in'){const up=mode==='up';$('#fab').innerHTML='';
+ $('#app').innerHTML=`<div class="top"><div class="bsd">בס"ד</div><span class="tools">${viewBtn()}</span></div><div class="login"><div class="ic" style="margin:0 auto 14px;width:60px;height:60px">${I.bld}</div><h1 style="justify-content:center;font-size:26px">הלקוחות והספקים שלי</h1><p class="sub" style="text-align:center">${up?'יצירת משתמש חדש':'כניסה עם שם משתמש וסיסמה'}</p>
+ <div class="tabs"><button class="tab ${up?'':'on'}" data-m="in">כניסה</button><button class="tab ${up?'on':''}" data-m="up">משתמש חדש</button></div>
+ <form id="lf"><label>שם משתמש<input name="u" autocomplete="username" required></label>${up?'<label>שם להצגה (לא חובה)<input name="n" placeholder="משתמש"></label>':''}<label>סיסמה<input name="p" type="password" autocomplete="${up?'new-password':'current-password'}" required minlength="4"></label><button class="btn" style="width:100%;justify-content:center;margin-top:18px">${up?'יצירת משתמש':'כניסה'}</button></form></div>`;
+ document.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>loginView(b.dataset.m));
+ $('#lf').onsubmit=async e=>{e.preventDefault();const f=Object.fromEntries(new FormData($('#lf')));const u=f.u.trim().toLowerCase(),all=users();
+  if(up){if(all[u])return toast('שם המשתמש תפוס');const salt=Math.random().toString(36).slice(2);all[u]={salt,h:await hash(f.p,salt),name:(f.n||'').trim()||'משתמש'};localStorage.setItem('hs_users',JSON.stringify(all))}
+  else{const r=all[u];if(!r||r.h!==await hash(f.p,r.salt))return toast('שם משתמש או סיסמה שגויים')}
+  U=u;localStorage.setItem('hs_sess',u);load();V={tab:'all',q:'',sort:'name',open:null,dt:'sum'};renderList();maybeNotify()}}
+function userDlg(){const d=$('#dlg');d.innerHTML=`<h3>המשתמש שלי</h3><form method="dialog" id="uf"><label>שם להצגה<input name="n" value="${esc(S.name)}"></label><div class="dl"><button class="btn" value="ok">שמירה</button><button class="btn sec" value="x" formnovalidate>ביטול</button><button class="btn sec" type="button" id="bkp">גיבוי</button><button class="btn sec" type="button" id="rst">שחזור</button></div></form>`;if(!d.open)d.showModal();
+ $('#bkp').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S)],{type:'application/json'}));a.download=`גיבוי-${U}-${iso(TODAY)}.json`;a.click()};
+ $('#rst').onclick=()=>{const i=document.createElement('input');i.type='file';i.accept='.json';i.onchange=async()=>{try{const r=JSON.parse(await i.files[0].text());if(!r.accts)throw 0;S=r;S.set=Object.assign({od:90,soon:7,bn:false,last:''},S.set);S.rem=S.rem||[];S.tpl=S.tpl||defTpl();S.log=S.log||[];save();d.close();renderList();toast('הנתונים שוחזרו')}catch(e){toast('קובץ גיבוי לא תקין')}};i.click()};
+  $('#uf').onsubmit=e=>{if(e.submitter?.value!=='ok')return;const n=new FormData($('#uf')).get('n').trim()||'משתמש';S.name=n;const all=users();if(all[U]){all[U].name=n;localStorage.setItem('hs_users',JSON.stringify(all))}save();renderList()}}
+let V={tab:'all',q:'',sort:'name',open:null,dt:'sum'};
+
+const TD={'שוטף':0,'שוטף + 30':30,'שוטף + 60':60,'שוטף + 90':90};
+function dueOf(t,a){if(t.due)return t.due;const x=a&&a.terms;if(!x||x==='מזומן'||!(x in TD))return t.d;const d=new Date(t.d+'T12:00'),e=new Date(d.getFullYear(),d.getMonth()+1,0,12);e.setDate(e.getDate()+TD[x]);return iso(e)}
+const bal=a=>a.tx.length?a.tx.reduce((s,t)=>s+(+t.debit||0)-(+t.credit||0),0):(+a.balance||0);
+const typeLbl=a=>a.type==='s'?'ספק':'לקוח';
+function aging(a){
+ const B=[{l:'שוטף / עתידי',v:0},{l:'עד 30 יום',v:0},{l:'31-60 יום',v:0},{l:'61-90 יום',v:0},{l:'מעל 90 יום',v:0}];
+ a.tx.forEach(t=>{const n=(+t.debit||0)-(+t.credit||0);const days=Math.floor((TODAY-new Date(dueOf(t,a)))/864e5);
+  B[days<=0?0:days<=30?1:days<=60?2:days<=90?3:4].v+=n});
+ return B}
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),2600)}
+
+/* ---------- list ---------- */
+function list(){
+ let L=S.accts.filter(a=>V.tab==='all'||(V.tab==='late'?a.type==='c'&&overdue(a)>0:a.type===V.tab));
+ const q=V.q.trim().toLowerCase();
+ if(q)L=L.filter(a=>(a.name+' '+a.id+' '+a.phone).toLowerCase().includes(q));
+ L=[...L].sort((x,y)=>V.sort==='name'?x.name.localeCompare(y.name,'he'):V.sort==='bal'?Math.abs(bal(y))-Math.abs(bal(x)):x.id.localeCompare(y.id));
+ return L}
+function renderList(){
+ const L=list();
+ $('#app').innerHTML=`
+ <div class="top"><div class="bsd">בס"ד</div><div class="hi"><button class="av" id="avb" aria-label="המשתמש שלי">${esc(S.name[0]||'א')}</button><div><b>שלום, ${esc(S.name)}</b><small>טוב לראות אותך שוב</small></div></div>${bellBtn()}</div>
+ <h1>${I.usr}הלקוחות והספקים שלי</h1>
+ <p class="sub">${S.accts.length} חשבונות בסך הכל</p>
+ <div class="st"><div class="card"><small>חייבים (לקוחות)</small><div class="v">${fmt(S.accts.filter(a=>a.type==='c'&&bal(a)>0).reduce((t,a)=>t+bal(a),0))}</div></div><div class="card"><small>לתשלום (ספקים)</small><div class="v">${fmt(S.accts.filter(a=>a.type==='s'&&bal(a)<0).reduce((t,a)=>t-bal(a),0))}</div></div><div class="card"><small>חובות בפיגור</small><div class="v neg">${fmt(S.accts.filter(a=>a.type==='c').reduce((t,a)=>t+Math.min(overdue(a),Math.max(bal(a),0)),0))}</div></div></div>
+ <div class="acts qa"><button class="act" data-q="rm">${I.bell}תזכורות${dueRem().length?`<i>${dueRem().length}</i>`:''}</button><button class="act" data-q="bk">${I.snd}שליחה לחייבים</button><button class="act" data-q="hs">${I.hs}יצוא לחשבשבת</button><button class="act" data-q="dc">${I.pdf}מסמכים</button><button class="act" data-q="lg">${I.clk}יומן</button></div>
+ <div class="search">${I.srch}<input id="q" type="search" placeholder="חיפוש לפי שם או מספר" value="${esc(V.q)}"></div>
+ <div class="row">
+  ${[['all','הכל'],['c','לקוחות'],['s','ספקים'],['late','בפיגור']].map(([k,l])=>`<button class="chip ${V.tab===k?'on':''}" data-t="${k}">${l}</button>`).join('')}
+  <span class="sp"></span>
+  <button class="chip" id="tpls">הודעות מובנות</button><button class="chip" id="srt">${I.srt} ${V.sort==='name'?'שם':V.sort==='bal'?'יתרה':'מספר'}</button>
+ </div>
+ <div id="lst">${rows(L)}</div>`;
+ $('#fab').innerHTML=`<button class="btn" id="add">+ חשבון חדש</button><button class="btn sec" id="imp">${I.up} בחירת קבצים</button><button class="btn sec" id="tls">כלים</button>`;
+ bind()}
+function rows(L){return L.length?L.map(a=>`<button class="item" data-id="${esc(a.id)}"><span class="ic">${I.bld}</span><span class="n"><b>${esc(a.name)}</b><small>${typeLbl(a)} ${esc(a.id)}</small></span><span class="amt ${bal(a)<0?'neg':'pos'}">${fmt(bal(a))}</span>${I.chv}</button>`).join(''):'<div class="empty">לא נמצאו חשבונות.<br>אפשר להוסיף חשבון חדש או לייבא קובץ אקסל מחשבשבת.</div>'}
+function bind(){
+ $('#q')?.addEventListener('input',e=>{V.q=e.target.value;$('#lst').innerHTML=rows(list());hookItems()});
+ document.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{V.tab=b.dataset.t;renderList()});
+ $('#srt')&&($('#srt').onclick=()=>{V.sort={name:'bal',bal:'id',id:'name'}[V.sort];renderList()});
+ $('#tpls')&&($('#tpls').onclick=()=>tplDlg());
+ $('#add')&&($('#add').onclick=()=>editDlg(null));
+ $('#imp')&&($('#imp').onclick=()=>$('#file').click());
+ $('#expall')&&($('#expall').onclick=exportAll);
+ $('#avb')&&($('#avb').onclick=userDlg);
+ hookItems()}
+function hookItems(){document.querySelectorAll('.item').forEach(b=>b.onclick=()=>{V.open=b.dataset.id;V.dt='sum';scrollTo(0,0);renderDetail()})}
+
+/* ---------- detail ---------- */
+const cur=()=>S.accts.find(a=>a.id===V.open);
+function renderDetail(){
+ const a=cur();if(!a){V.open=null;return renderList()}
+ const b=bal(a);
+ const tabs=[['doc','מסמכים'],['fil','קבצים'],['dat','נתונים'],['led','כרטסת'],['age','גיול חובות'],['rc',a.type==='s'?'תשלומים':'תקבולים'],['inf','פרטים'],['sum','סיכום']];
+ let body='';
+ if(V.dt==='sum'){
+  const over=aging(a)[4].v;
+  body=`<div class="card big"><span class="ic">${I.db}</span><div><small>יתרה בחשבון · ${b<0?'יתרת זכות':'יתרת חובה'}</small><div class="v ${b<0?'neg':''}">${b<0?'-':''}₪${fmt(Math.abs(b)).replace('-','')}</div></div></div>
+  <div class="g2"><div class="card"><small>תנועות פתוחות</small><div class="v">${a.tx.length}</div><small>נכון ל־${heDate(iso(TODAY))}</small></div>
+  <div class="card"><small>חובות בפיגור מעל 90 יום</small><div class="v ${over>0?'neg':''}">${fmt(over)}</div></div></div>
+  <div class="acts" style="margin-top:12px">
+   <button class="act" data-d="rc">${I.db}${a.type==='s'?'תשלומים':'תקבולים'}</button><button class="act" data-d="led">${I.pdf}כרטסת תנועות</button><button class="act" data-d="age">${I.cal}גיול חובות</button><button class="act" data-d="dat">${I.bar}נתונים</button></div>
+  <div class="acts">
+   <button class="act wa" data-a="wa">${I.wa}וואטסאפ</button><button class="act" data-a="ml">${I.ml}מייל</button><button class="act" data-a="pdf">${I.pdf}PDF</button><button class="act" data-a="xl">${I.xl}אקסל</button></div>
+  <button class="btn" style="width:100%;justify-content:center;margin-bottom:12px" data-a="msg">${I.ml} שליחת הודעה / תזכורת</button><div class="g2"><button class="btn sec" style="justify-content:center" data-a="ed">${I.ed} עריכת חשבון</button><button class="btn sec" style="justify-content:center" data-a="rem">${I.bell} תזכורת</button></div><div class="acts"><button class="act" data-a="tx">${I.db}תנועה חדשה</button><button class="act" data-a="fu">${I.up}העלאת מסמך</button><button class="act" data-a="sc">${I.cam}סריקה</button><button class="act" data-a="hs">${I.hs}יצוא לחשבשבת</button></div>`}
+ if(V.dt==='led'){let run=0;
+  body=`<div class="acts"><button class="act wa" data-a="wa">${I.wa}שליחה</button><button class="act" data-a="ml">${I.ml}מייל</button><button class="act" data-a="pdf">${I.pdf}PDF</button><button class="act" data-a="xl">${I.xl}אקסל</button></div>`+(a.tx.length?`<div class="tw"><table><thead><tr><th>תאריך</th><th>אסמכתא</th><th>פרטים</th><th>חובה</th><th>זכות</th><th>יתרה</th></tr></thead><tbody>${[...a.tx].sort((x,y)=>x.d.localeCompare(y.d)).map(t=>{run+=(+t.debit||0)-(+t.credit||0);return`<tr><td>${heDate(t.d)}</td><td>${esc(t.ref)}</td><td>${esc(t.desc)}</td><td class="n">${t.debit?fmt(+t.debit):''}</td><td class="n">${t.credit?fmt(+t.credit):''}</td><td class="n ${run<0?'neg':''}">${fmt(run)}</td></tr>`}).join('')}</tbody><tfoot><tr><td colspan="5">יתרה סופית</td><td class="n ${b<0?'neg':''}">${fmt(b)}</td></tr></tfoot></table></div>`:'<div class="empty">אין תנועות. אפשר לייבא כרטסת מקובץ אקסל.</div>')}
+ if(V.dt==='age'){const A=aging(a),mx=Math.max(...A.map(x=>Math.abs(x.v)),1);
+  body=`<div class="card">${A.map(x=>`<div class="bar"><span>${x.l}</span><div class="tr"><i style="width:${Math.abs(x.v)/mx*100}%;${x.v<0?'background:var(--grn)':''}"></i></div><b class="${x.v<0?'neg':''}">${fmt(x.v)}</b></div>`).join('')}<div class="bar" style="border-top:1px solid var(--line);padding-top:12px"><span><b>סה"כ</b></span><div class="tr" style="background:none"></div><b class="${b<0?'neg':''}">${fmt(A.reduce((s,x)=>s+x.v,0)||b)}</b></div></div>
+  <p class="hint">הגיול מחושב לפי תאריך פרעון (ואם אין – תאריך התנועה). סכומים שליליים הם זכויות.</p>
+  <div class="acts"><button class="act wa" data-a="wa">${I.wa}שליחה</button><button class="act" data-a="ml">${I.ml}מייל</button><button class="act" data-a="pdf">${I.pdf}PDF</button><button class="act" data-a="xl">${I.xl}אקסל</button></div>`}
+ if(V.dt==='doc'){body=a.tx.length?`<div class="card">${[...a.tx].sort((x,y)=>y.d.localeCompare(x.d)).map(t=>{const i=a.tx.indexOf(t),v=(+t.debit||0)-(+t.credit||0);return`<div class="dc"><span class="ic">${I.pdf}</span><div class="n"><b>${esc(t.desc||'מסמך')} ${esc(t.ref)}</b><small>${heDate(t.d)}${t.due?' · פרעון '+heDate(t.due):''}</small></div><span class="amt ${v<0?'neg':''}">${fmt(v)}</span><button class="mini" data-dw="${i}" aria-label="וואטסאפ">${I.wa.replace('width="24" height="24"','width="18" height="18"')}</button><button class="mini" data-dm="${i}" aria-label="מייל">${I.ml.replace('width="24" height="24"','width="18" height="18"')}</button></div>`}).join('')}</div>`:'<div class="empty">אין מסמכים. אפשר לייבא תנועות מאקסל.</div>'}
+ if(V.dt==='fil'){body=`<div class="acts"><button class="act" data-a="fu">${I.up}העלאת קובץ</button><button class="act" data-a="sc">${I.cam}סריקה</button><button class="act" data-a="tx">${I.db}תנועה חדשה</button><button class="act" data-a="hs">${I.hs}יצוא לחשבשבת</button></div><div id="fl"></div>`}
+ if(V.dt==='dat'){const D=a.tx.reduce((o,t)=>(o.dr+=+t.debit||0,o.cr+=+t.credit||0,o),{dr:0,cr:0}),last=[...a.tx].map(t=>t.d).sort().pop();
+  body=`<div class="g2"><div class="card"><small>סה"כ חובה</small><div class="v">${fmt(D.dr)}</div></div><div class="card"><small>סה"כ זכות</small><div class="v">${fmt(D.cr)}</div></div><div class="card"><small>יתרה</small><div class="v ${b<0?'neg':''}">${fmt(b)}</div></div><div class="card"><small>מספר תנועות</small><div class="v">${a.tx.length}</div></div><div class="card"><small>תנועה אחרונה</small><div class="v">${last?heDate(last):'—'}</div></div><div class="card"><small>ח.פ / ע.מ</small><div class="v">${esc(a.taxId||'—')}</div></div></div><h3 style="font-size:18px;margin:18px 0 8px">יומן אירועים <button class="chip" data-lg="1" style="margin-inline-start:8px">היומן המלא</button></h3><div class="card">${S.log.filter(x=>x.acct===a.id).slice(0,8).map(x=>evRow(x)).join('')||'<div class="empty" style="padding:10px">אין עדיין אירועים.</div>'}</div>`}
+ if(V.dt==='rc'){const sup=a.type==='s',L=a.tx.filter(t=>sup?+t.debit>0:+t.credit>0).sort((x,y)=>y.d.localeCompare(x.d)),tot=L.reduce((q,t)=>q+(sup?+t.debit:+t.credit),0);
+  body=`<div class="card"><small style="color:var(--mute)">תנאי תשלום</small><div class="v" style="font-family:'Frank Ruhl Libre';font-size:24px;font-weight:700;margin-top:4px">${esc(a.terms||'לא הוגדר')}</div></div>
+  <div class="card">${L.length?L.map(t=>`<div class="dc"><span class="ic">${I.db}</span><div class="n"><b>${esc(t.desc||'קבלה')} ${esc(t.ref)}</b><small>${heDate(t.d)}</small></div><span class="amt">${fmt(sup?+t.debit:+t.credit)}</span></div>`).join('')+`<div class="dc"><div class="n"><b>סה"כ</b></div><span class="amt">${fmt(tot)}</span></div>`:'<div class="empty">עדיין לא נרשמו רשומות.</div>'}</div>
+  <button class="btn" style="width:100%;justify-content:center" data-a="rc">+ רישום ${sup?'תשלום':'תקבול'}</button>`}
+ if(V.dt==='inf'){body=`<div class="card"><dl><dt>מספר ${typeLbl(a)}</dt><dd>${esc(a.id)}</dd><dt>שם</dt><dd>${esc(a.name)}</dd><dt>ח.פ / ע.מ</dt><dd>${esc(a.taxId||"—")}</dd><dt>סוכן</dt><dd>${esc(a.agent||'—')}</dd><dt>טלפון</dt><dd>${a.phone?`<a href="tel:${esc(a.phone)}">${esc(a.phone)}</a>`:'—'}</dd><dt>דוא"ל</dt><dd>${a.email?`<a href="mailto:${esc(a.email)}">${esc(a.email)}</a>`:'—'}</dd><dt>כתובת</dt><dd>${esc(a.address||'—')}</dd><dt>תנאי תשלום</dt><dd>${esc(a.terms||'—')}</dd><dt>הערות</dt><dd>${esc(a.note||'—')}</dd></dl></div><h3 style="font-size:18px;margin:18px 0 8px">אנשי קשר לשליחת הודעות</h3><div class="card">${(a.contacts||[]).map((c,i)=>`<div class="dc"><div class="n"><b>${esc(c.name)}</b><small>${esc(c.role||'')} ${c.phone?'· '+esc(c.phone):''}</small></div><button class="mini" data-cw="${i}" aria-label="שליחה">${I.wa.replace('width="24" height="24"','width="18" height="18"')}</button><button class="mini" data-ce="${i}" aria-label="עריכה">${I.ed.replace('width="24" height="24"','width="18" height="18"')}</button><button class="mini" data-cd="${i}" aria-label="מחיקה">✕</button></div>`).join('')||'<div class="empty" style="padding:10px">אין אנשי קשר. הוסף מספרי טלפון כדי לשלוח להם תזכורות.</div>'}</div><div class="g2"><button class="btn" style="justify-content:center" data-a="ct">+ איש קשר</button><button class="btn sec" style="justify-content:center" data-a="ed">${I.ed} עריכה</button></div>`}
+ $('#app').innerHTML=`<div class="top"><div class="bsd">בס"ד</div>${bellBtn()}</div><button class="back" id="bk" aria-label="חזרה">${I.bk} חזרה לרשימה</button>
+ <div class="hd"><div class="ic">${I.bld}</div><h2>${esc(a.name)}</h2><small>${typeLbl(a)} ${esc(a.id)}${a.agent?' · סוכן '+esc(a.agent):''}</small></div>
+ <div class="tabs" role="tablist">${tabs.map(([k,l])=>`<button class="tab ${V.dt===k?'on':''}" data-d="${k}" role="tab">${l}</button>`).join('')}</div>${body}`;
+ if(V.dt==='fil')fillFiles(a);$('#fab').innerHTML='';document.querySelector('.tab.on')?.scrollIntoView({inline:'center',block:'nearest'});
+ $('#bk').onclick=()=>{V.open=null;renderList()};
+ document.querySelectorAll('[data-d]').forEach(x=>x.onclick=()=>{V.dt=x.dataset.d;scrollTo(0,0);renderDetail()});
+ document.querySelectorAll('[data-dw]').forEach(x=>x.onclick=()=>shareWa(a,a.tx[x.dataset.dw]));document.querySelectorAll('[data-dm]').forEach(x=>x.onclick=()=>shareMail(a,a.tx[x.dataset.dm]));
+ document.querySelectorAll('[data-cd]').forEach(x=>x.onclick=()=>{a.contacts.splice(+x.dataset.cd,1);save();renderDetail()});document.querySelectorAll('[data-cw]').forEach(x=>x.onclick=()=>sendDlg(a,'t1',+x.dataset.cw+1));
+ document.querySelectorAll('[data-a]').forEach(x=>x.onclick=()=>({wa:shareWa,ml:shareMail,pdf:toPdf,xl:toXlsx,ed:()=>editDlg(a.id),rc:()=>rcptDlg(a),rem:()=>remDlg(a),msg:()=>sendDlg(a,a.type==='s'?'t5':(overdue(a)>0?'t1':'t4')),ct:()=>contactDlg(a),tx:()=>txDlg(a),fu:()=>pickFile(a,false),sc:()=>pickFile(a,true),hs:()=>hsDlg(a)})[x.dataset.a](a))}
+
+/* ---------- share / export ---------- */
+function stmt(a){const b=bal(a);let t=`בס"ד\nכרטיס ${typeLbl(a)}: ${a.name} (${a.id})${a.taxId?'\nח.פ / ע.מ: '+a.taxId:''}\nנכון ל־${heDate(iso(TODAY))}\nיתרה: ${fmt(b)} ₪ (${b<0?'זכות':'חובה'})\n`;
+ const A=aging(a);if(a.tx.length)t+='\nגיול:\n'+A.map(x=>`• ${x.l}: ${fmt(x.v)}`).join('\n');
+ if(a.tx.length){t+='\n\nכרטסת:\n';let r=0;[...a.tx].sort((x,y)=>x.d.localeCompare(y.d)).forEach(x=>{r+=(+x.debit||0)-(+x.credit||0);t+=`${heDate(x.d)} | ${x.ref} | ${x.desc} | חובה ${fmt(+x.debit||0)} | זכות ${fmt(+x.credit||0)} | יתרה ${fmt(r)}\n`})}
+ return t}
+function docTxt(a,t){return `בס"ד\n${typeLbl(a)}: ${a.name} (${a.id})\n${t.desc} ${t.ref}\nתאריך: ${heDate(t.d)}\nחובה: ${fmt(+t.debit||0)} | זכות: ${fmt(+t.credit||0)}${t.due?'\nפרעון: '+heDate(t.due):''}`}
+function shareWa(a,t){let p=(a.phone||'').replace(/\D/g,'');if(p.startsWith('0'))p='972'+p.slice(1);
+ const m=t?docTxt(a,t):stmt(a);openExt(`https://wa.me/${p}?text=${encodeURIComponent(m)}`,m);evt('msg',a,{ch:'וואטסאפ',to:a.name,tpl:t?(t.desc+' '+t.ref):'כרטסת'})}
+function shareMail(a,t){const m=t?docTxt(a,t):stmt(a);openExt(`mailto:${a.email||''}?subject=${encodeURIComponent((t?t.desc+' '+t.ref+' - ':'כרטיס חשבון - ')+a.name)}&body=${encodeURIComponent(t?docTxt(a,t):stmt(a))}`,m);evt('msg',a,{ch:'מייל',to:a.name,tpl:t?(t.desc+' '+t.ref):'כרטסת'})}
+function printHtml(a){const b=bal(a),A=aging(a);let r=0;
+ return `<div style="direction:rtl;font-family:Assistant,Arial"><div style="text-align:right;font-weight:700">בס"ד</div><h2>כרטיס ${typeLbl(a)}: ${esc(a.name)}</h2><div>מספר ${esc(a.id)}${a.taxId?' · ח.פ/ע.מ '+esc(a.taxId):''} · ${esc(a.phone||'')} · ${esc(a.email||'')}<br>נכון ל־${heDate(iso(TODAY))}</div><h2>יתרה: ${fmt(b)} ₪ (${b<0?'זכות':'חובה'})</h2>
+ <h3>גיול חובות</h3><table><tr>${A.map(x=>`<th>${x.l}</th>`).join('')}</tr><tr>${A.map(x=>`<td>${fmt(x.v)}</td>`).join('')}</tr></table>
+ <h3>כרטסת</h3><table><tr><th>תאריך</th><th>אסמכתא</th><th>פרטים</th><th>חובה</th><th>זכות</th><th>יתרה</th></tr>${[...a.tx].sort((x,y)=>x.d.localeCompare(y.d)).map(t=>{r+=(+t.debit||0)-(+t.credit||0);return`<tr><td>${heDate(t.d)}</td><td>${esc(t.ref)}</td><td>${esc(t.desc)}</td><td>${t.debit?fmt(+t.debit):''}</td><td>${t.credit?fmt(+t.credit):''}</td><td>${fmt(r)}</td></tr>`}).join('')}</table></div>`}
+function toPdf(a){$('#print').innerHTML=printHtml(a);toast('בחר "שמירה כ־PDF" בחלון ההדפסה');setTimeout(()=>print(),300)}
+function sheetsFor(a){const A=aging(a);let r=0;return{
+ 'פרטים':[['מספר',a.id],['שם',a.name],['ח.פ / ע.מ',a.taxId],['סוג',typeLbl(a)],['סוכן',a.agent],['טלפון',a.phone],['דוא"ל',a.email],['כתובת',a.address],['יתרה',bal(a)]],
+ 'כרטסת':[['תאריך','אסמכתא','פרטים','חובה','זכות','יתרה','תאריך פרעון'],...[...a.tx].sort((x,y)=>x.d.localeCompare(y.d)).map(t=>{r+=(+t.debit||0)-(+t.credit||0);return[heDate(t.d),t.ref,t.desc,+t.debit||0,+t.credit||0,r,heDate(t.due)]})],
+ 'גיול':[A.map(x=>x.l),A.map(x=>x.v)]}}
+function toXlsx(a){if(!window.XLSX)return toast('ספריית האקסל לא נטענה, בדוק חיבור');const wb=XLSX.utils.book_new();wb.Workbook={Views:[{RTL:true}]};
+ const S2=sheetsFor(a);for(const k in S2)XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(S2[k]),k);
+ XLSX.writeFile(wb,`${a.id}-${a.name.replace(/[\\/:*?"<>|]/g,'')}.xlsx`)}
+function exportAll(){if(!window.XLSX)return toast('ספריית האקסל לא נטענה');const wb=XLSX.utils.book_new();wb.Workbook={Views:[{RTL:true}]};
+ XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['מספר','שם','ח.פ / ע.מ','סוג','סוכן','טלפון','דוא"ל','כתובת','יתרה'],...S.accts.map(a=>[a.id,a.name,a.taxId,typeLbl(a),a.agent,a.phone,a.email,a.address,bal(a)])]),'חשבונות');
+ XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['מספר חשבון','שם','תאריך','אסמכתא','פרטים','חובה','זכות','תאריך פרעון'],...S.accts.flatMap(a=>a.tx.map(t=>[a.id,a.name,t.d,t.ref,t.desc,+t.debit||0,+t.credit||0,t.due||'']))]),'תנועות');
+ XLSX.writeFile(wb,'לקוחות-וספקים.xlsx')}
+
+/* ---------- edit ---------- */
+function editDlg(id){const a=id?S.accts.find(x=>x.id===id):{id:'',name:'',type:'c',taxId:'',agent:'',phone:'',email:'',address:'',tx:[]};const d=$('#dlg');
+ d.innerHTML=`<h3>${id?'עריכת חשבון':'חשבון חדש'}</h3><form method="dialog" id="fm">
+ <label>סוג<select name="type"><option value="c" ${a.type==='c'?'selected':''}>לקוח</option><option value="s" ${a.type==='s'?'selected':''}>ספק</option></select></label>
+ <label>מספר חשבון<input name="id" required value="${esc(a.id)}"></label><label>שם<input name="name" required value="${esc(a.name)}"></label>
+ <label>ח.פ / ע.מ<input name="taxId" inputmode="numeric" value="${esc(a.taxId)}"></label><label>תנאי תשלום<select name="terms">${['','מזומן','שוטף','שוטף + 30','שוטף + 60','שוטף + 90'].map(x=>`<option value="${x}" ${a.terms===x?'selected':''}>${x||'לא הוגדר'}</option>`).join('')}</select></label><label>סוכן<input name="agent" value="${esc(a.agent)}"></label><label>טלפון<input name="phone" type="tel" value="${esc(a.phone)}"></label>
+ <label>דוא"ל<input name="email" type="email" value="${esc(a.email)}"></label><label>כתובת<input name="address" value="${esc(a.address)}"></label><label>הערות<input name="note" value="${esc(a.note||'')}"></label>
+ ${a.tx.length?'':`<label>יתרה פתיחה (חובה חיובי, זכות שלילי)<input name="balance" type="number" step="0.01" value="${a.balance||0}"></label>`}
+ <div class="dl"><button class="btn" value="ok">שמירה</button><button class="btn sec" value="x" formnovalidate>ביטול</button>${id?'<button class="btn danger" type="button" id="del">מחיקה</button>':''}</div></form>`;
+ if(!d.open)d.showModal();
+ $('#del')&&($('#del').onclick=()=>{if(confirm('למחוק את החשבון וכל התנועות שלו?')){S.accts=S.accts.filter(x=>x.id!==id);save();d.close();V.open=null;renderList()}});
+ $('#fm').onsubmit=e=>{if(e.submitter?.value!=='ok')return;const f=Object.fromEntries(new FormData($('#fm')));
+  Object.assign(a,f,{balance:+f.balance||0});if(!id)S.accts.push(a);else if(f.id!==id)V.open=f.id;evt('acct',a,{ch:id?'חשבון עודכן':'חשבון נוצר'});save();V.open?renderDetail():renderList()}}
+
+function rcptDlg(a){const sup=a.type==='s',d=$('#dlg');d.innerHTML=`<h3>${sup?'רישום תשלום לספק':'רישום תקבול'}</h3><form method="dialog" id="rcf"><label>סכום<input name="amt" type="number" step="0.01" min="0.01" required></label><label>תאריך<input name="d" type="date" required value="${iso(TODAY)}"></label><label>אמצעי תשלום<select name="m"><option>העברה בנקאית</option><option>צ'ק</option><option>מזומן</option><option>כרטיס אשראי</option></select></label><label>אסמכתא<input name="ref"></label><div class="dl"><button class="btn" value="ok">שמירה</button><button class="btn sec" value="x" formnovalidate>ביטול</button></div></form>`;if(!d.open)d.showModal();
+ $('#rcf').onsubmit=e=>{if(e.submitter?.value!=='ok')return;const f=Object.fromEntries(new FormData($('#rcf'))),v=+f.amt||0;
+  if(!a.tx.length&&a.balance)a.tx.push({d:iso(TODAY),ref:'',desc:'יתרת פתיחה',debit:a.balance>0?a.balance:0,credit:a.balance<0?-a.balance:0,due:iso(TODAY)});
+  a.tx.push({d:f.d,ref:f.ref,desc:(sup?'תשלום - ':'קבלה - ')+f.m,debit:sup?v:0,credit:sup?0:v,due:f.d,app:1,k:'pay'});evt('tx',a,{ch:sup?'נרשם תשלום':'נרשם תקבול',text:fmt(v)});save();renderDetail();toast('נרשם')}}
+function recipients(a){const o=[];if(a.phone||a.email)o.push({n:'איש קשר ראשי',phone:a.phone,email:a.email});(a.contacts||[]).forEach(c=>o.push({n:c.name+(c.role?' – '+c.role:''),phone:c.phone,email:c.email,c:c.name}));return o.length?o:[{n:'ללא איש קשר',phone:'',email:''}]}
+function fillTpl(t,a,c){const b=bal(a),m={'שם':a.name,'מספר':a.id,'יתרה':fmt(b),'חוב_בפיגור':fmt(Math.min(overdue(a),Math.max(b,0))),'תאריך':heDate(iso(TODAY)),'איש_קשר':c||a.name,'שם_משתמש':S.name};return t.replace(/\{([^}]+)\}/g,(x,k)=>k in m?m[k]:x)}
+function sendDlg(a,tid,ri){const d=$('#dlg'),R=recipients(a);
+ d.innerHTML=`<h3>הודעה ל־${esc(a.name)}</h3><label>תבנית<select id="stp">${S.tpl.map(t=>`<option value="${t.id}" ${t.id===tid?'selected':''}>${esc(t.name)}</option>`).join('')}</select></label><label>נמען<select id="srx">${R.map((r,i)=>`<option value="${i}" ${i===ri?'selected':''}>${esc(r.n)}${r.phone?' · '+esc(r.phone):''}</option>`).join('')}</select></label><label>נוסח ההודעה (אפשר לערוך)<textarea id="smsg" rows="7"></textarea></label><label class="chk"><input type="checkbox" id="satt">צירוף כרטסת להודעה</label><div class="dl"><button class="btn" id="swa">${I.wa.replace('width="24" height="24"','width="18" height="18"')} וואטסאפ</button><button class="btn sec" id="sml">מייל</button><button class="btn sec" id="ssm">SMS</button><button class="btn sec" id="scl">סגירה</button></div>`;
+ if(!d.open)d.showModal();
+ const cr=()=>R[$('#srx').value],upd=()=>{const t=S.tpl.find(x=>x.id===$('#stp').value);$('#smsg').value=t?fillTpl(t.text,a,cr().c):''};
+ upd();$('#stp').onchange=upd;$('#srx').onchange=upd;$('#scl').onclick=()=>d.close();
+ const body=()=>$('#smsg').value+($('#satt').checked?'\n\n'+stmt(a):''),log=ch=>evt('msg',a,{ch,tpl:S.tpl.find(x=>x.id===$('#stp').value)?.name||'',to:cr().n,text:$('#smsg').value});
+ $('#swa').onclick=()=>{let p=(cr().phone||'').replace(/\D/g,'');if(p.startsWith('0'))p='972'+p.slice(1);openExt(`https://wa.me/${p}?text=${encodeURIComponent(body())}`,body());log('וואטסאפ')};
+ $('#sml').onclick=()=>{log('מייל');openExt(`mailto:${cr().email||''}?subject=${encodeURIComponent(a.name)}&body=${encodeURIComponent(body())}`,body())};
+ $('#ssm').onclick=()=>{log('SMS');openExt(`sms:${cr().phone||''}?&body=${encodeURIComponent(body())}`,body())}}
+function tplDlg(sel){const d=$('#dlg'),t=S.tpl.find(x=>x.id===sel)||S.tpl[0];
+ d.innerHTML=`<h3>הודעות מובנות</h3><label>תבנית<select id="tsel">${S.tpl.map(x=>`<option value="${x.id}" ${x===t?'selected':''}>${esc(x.name)}</option>`).join('')}</select></label><label>שם התבנית<input id="tnm" value="${esc(t?t.name:'')}"></label><label>נוסח<textarea id="ttx" rows="8">${esc(t?t.text:'')}</textarea></label><p class="hint">משתנים שמתמלאים אוטומטית: {שם} {מספר} {יתרה} {חוב_בפיגור} {תאריך} {איש_קשר} {שם_משתמש}</p><div class="dl"><button class="btn" id="tsv">שמירה</button><button class="btn sec" id="tnw">תבנית חדשה</button><button class="btn sec" id="tdl">מחיקה</button><button class="btn sec" id="tcl">סגירה</button></div>`;
+ if(!d.open)d.showModal();$('#tcl').onclick=()=>d.close();$('#tsel').onchange=e=>tplDlg(e.target.value);
+ $('#tsv').onclick=()=>{if(t){t.name=$('#tnm').value||t.name;t.text=$('#ttx').value;save();toast('נשמר');tplDlg(t.id)}};
+ $('#tnw').onclick=()=>{const n={id:'t'+Date.now(),name:'תבנית חדשה',text:'שלום {איש_קשר},\n'};S.tpl.push(n);save();tplDlg(n.id)};
+ $('#tdl').onclick=()=>{if(t&&S.tpl.length>1&&confirm('למחוק את התבנית?')){S.tpl=S.tpl.filter(x=>x!==t);save();tplDlg()}}}
+function logHtml(){return''}
+/* ---------- import ---------- */
+function importDlg(){const d=$('#dlg');
+ d.innerHTML=`<h3>ייבוא מחשבשבת</h3><p class="hint">ייצאו מחשבשבת לאקסל ובחרו את הקובץ. אפשר קובץ אחד עם שתי לשוניות, או שני קבצים בזה אחר זה.<br><b>חשבונות:</b> מספר, שם, סוג (לקוח/ספק), סוכן, טלפון, דוא"ל, כתובת, יתרה.<br><b>אנשי קשר (לא חובה):</b> מספר חשבון, שם, תפקיד, טלפון, דוא"ל.<br><b>תנועות:</b> מספר חשבון, תאריך, אסמכתא, פרטים, חובה, זכות, תאריך פרעון.<br>הערכים מזוהים לפי כותרות העמודות, ותנועות קיימות של אותו חשבון מוחלפות.</p>
+ <div class="dl"><button class="btn" id="pick">בחירת קובץ</button><button class="btn sec" id="tpl">הורדת תבנית</button><button class="btn sec" id="cl">סגירה</button></div>`;
+ if(!d.open)d.showModal();$('#cl').onclick=()=>d.close();$('#pick').onclick=()=>$('#file').click();
+ $('#tpl').onclick=()=>{if(!window.XLSX)return;const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['מספר','שם','ח.פ / ע.מ','סוג','סוכן','טלפון','דוא"ל','כתובת','יתרה'],['100707','לקוח לדוגמה','510000000','לקוח','A00007','02-0000000','mail@example.com','','0']]),'חשבונות');
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['מספר חשבון','תאריך','אסמכתא','פרטים','חובה','זכות','תאריך פרעון'],['100707','2026-01-31','1001','חשבונית מס',1000,0,'2026-03-02']]),'תנועות');
+  XLSX.writeFile(wb,'תבנית-ייבוא.xlsx')}}
+const K=(o,...ks)=>{for(const k in o){const n=k.replace(/[\s"'״׳.]/g,'');if(ks.some(x=>n.includes(x)))return o[k]}return''};
+const num=v=>{const n=parseFloat(String(v??'').replace(/[,₪\s]/g,''));return isNaN(n)?0:n};
+const dt=v=>{if(v instanceof Date)return iso(v);if(typeof v==='number'&&v>20000){return iso(new Date(Math.round((v-25569)*864e5)))}
+ const s=String(v||'').trim();let m=s.match(/^(\d{1,2})[./-](\d{1,2})[./-](\d{2,4})$/);if(m){const y=m[3].length===2?'20'+m[3]:m[3];return`${y}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`}return s.slice(0,10)};
+$('#file').onchange=async e=>{const F=[...e.target.files];e.target.value='';if(!F.length)return;
+ if(!window.XLSX)return toast('ספריית האקסל לא נטענה');
+ try{let na=0,nt=0;for(const f of F){const wb=XLSX.read(await f.arrayBuffer(),{type:'array',cellDates:true});
+  for(const sn of wb.SheetNames){const R=XLSX.utils.sheet_to_json(wb.Sheets[sn],{defval:''});if(!R.length)continue;const h=Object.keys(R[0]).join('|');
+   const isTx=/חובה|זכות|אסמכתא|תאריך/.test(h)&&/אסמכתא|פרטים|תאריךערך|תאריך/.test(h)&&/חובה|זכות/.test(h)&&!/שם(?!חש)/.test('');
+   if(/תפקיד/.test(h)){R.forEach(r=>{const a=S.accts.find(x=>x.id===String(K(r,'מספרחשבון','מספר')).trim());if(a)(a.contacts=a.contacts||[]).push({name:String(K(r,'שם')),role:String(K(r,'תפקיד')),phone:String(K(r,'טלפון','נייד')),email:String(K(r,'דוא','מייל'))})})}
+   else if(/חובה|זכות/.test(h)&&/תאריך/.test(h)){const grp={};
+    R.forEach(r=>{const id=String(K(r,'מספרחשבון','חשבון','מפתח','לקוח','ספק','מספר')).trim();if(!id)return;(grp[id]=grp[id]||[]).push({d:dt(K(r,'תאריךערך','תאריך')),ref:String(K(r,'אסמכתא','אסמכתה','מסמך')),desc:String(K(r,'פרטים','תיאור','פירוט')),debit:num(K(r,'חובה')),credit:num(K(r,'זכות')),due:dt(K(r,'פרעון','תשלום'))||dt(K(r,'תאריך'))})});
+    for(const id in grp){let a=S.accts.find(x=>x.id===id);if(!a){a={id,name:'חשבון '+id,type:id[0]==='2'?'s':'c',taxId:'',agent:'',phone:'',email:'',address:'',tx:[]};S.accts.push(a);na++}a.tx=grp[id];nt+=grp[id].length}}
+   else if(/שם/.test(h)){R.forEach(r=>{const id=String(K(r,'מספרחשבון','מספרלקוח','מספרספק','מפתח','קוד')||r['מספר']||'').trim(),name=String(K(r,'שם')).trim();if(!id||!name)return;
+     const ty=String(K(r,'סוג','קבוצה'));let a=S.accts.find(x=>x.id===id);const n={id,name,type:/ספק|ס/.test(ty)&&!/לקוח/.test(ty)?'s':'c',taxId:String(K(r,'חפ','עמ','עוסק','זהות')),agent:String(K(r,'סוכן')),phone:String(K(r,'טלפון','נייד')),email:String(K(r,'דוא','מייל')),address:String(K(r,'כתובת')),balance:num(K(r,'יתרה'))};
+     if(a)Object.assign(a,n);else{S.accts.push({...n,tx:[]});na++}})}}}
+  save();evt('imp',null,{ch:'ייבוא קבצים',text:`${F.length} קבצים · ${na} חשבונות חדשים · ${nt} תנועות`});$('#dlg').close();V.open?renderDetail():renderList();toast(`יובאו ${na} חשבונות חדשים ו־${nt} תנועות`)}catch(err){toast('לא הצלחתי לקרוא את הקובץ')}};
+/* ================= v2: reminders, documents, scan, HS export ================= */
+const ldate=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const lday=()=>ldate(new Date());
+const addDays=(s,n)=>{const d=new Date(s+'T12:00');d.setDate(d.getDate()+n);return ldate(d)};
+const sv=(p,w=24)=>`<svg width="${w}" height="${w}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+Object.assign(I,{
+ up:sv('<path d="M12 16V4M7 9l5-5 5 5M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>'),
+ cam:sv('<path d="M4 8h3l2-3h6l2 3h3v11H4zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/>'),
+ eye:sv('<path d="M2 12s3.600-7 10-7 10 7 10 7-3.600 7-10 7S2 12 2 12zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>'),
+ dl:sv('<path d="M12 4v12M7 11l5 5 5-5M4 20h16"/>'),
+ trash:sv('<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>'),
+ clk:sv('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
+ snd:sv('<path d="M21 3L3 10.500l7 3 3 7zM10 13.500L21 3"/>'),
+ hs:sv('<path d="M5 3h9l5 5v13H5zM14 3v5h5M9 14l3 3 3-3M12 17v-6"/>')
+});
+const sm=k=>I[k].replace(/width="\d+" height="\d+"/,'width="18" height="18"');
+const kb=n=>n>1048576?(n/1048576).toFixed(1)+' MB':Math.max(1,Math.round(n/1024))+' KB';
+const waUrl=(p,t)=>{p=String(p||'').replace(/\D/g,'');if(p.startsWith('0'))p='972'+p.slice(1);return `https://wa.me/${p}?text=${encodeURIComponent(t)}`};
+const prim=a=>{const R=recipients(a);return R.find(r=>r.phone)||R[0]};
+const refresh=()=>V.open?renderDetail():renderList();
+const ovOf=a=>Math.min(overdue(a),Math.max(bal(a),0));
+function overdue(a){return a.tx.reduce((s,t)=>{const days=Math.floor((TODAY-new Date(dueOf(t,a)+'T12:00'))/864e5);return days>0?s+(+t.debit||0)-(+t.credit||0):s},0)}
+
+/* ---------- reminders ---------- */
+const dueRem=()=>S?S.rem.filter(r=>!r.done&&r.date<=lday()):[];
+const badge=()=>{const n=dueRem().length;document.querySelectorAll('#bl').forEach(b=>{b.innerHTML=I.bell+(n?`<i>${n}</i>`:'')})};
+const bellBtn=()=>`<span class="tools">${viewBtn()}<button class="bell" id="bl" aria-label="תזכורות" title="תזכורות">${I.bell}${dueRem().length?`<i>${dueRem().length}</i>`:''}</button></span>`;
+const notify=(t,b)=>{try{if('Notification' in window&&Notification.permission==='granted')new Notification(t,{body:b||''})}catch(e){}};
+function maybeNotify(){const L=dueRem();if(!L.length)return;
+ if(S.set.last!==lday()){S.set.last=lday();save();setTimeout(remindersDlg,500)}else toast(`יש ${L.length} תזכורות לטיפול`);
+ notify(`יש לך ${L.length} תזכורות לטיפול`,'בס"ד – הלקוחות והספקים שלי')}
+setInterval(()=>{if(!S)return;const n=lday(),h=new Date().toTimeString().slice(0,5);let ch=0;
+ S.rem.forEach(r=>{if(!r.done&&!r.n&&r.date===n&&(r.time||'00:00')<=h){r.n=1;ch=1;const a=S.accts.find(x=>x.id===r.acct);evt('rem',a,{ch:'התראת תזכורת הופעלה',text:r.note});toast('תזכורת: '+(a?a.name:'')+(r.note?' – '+r.note:''));notify('תזכורת – '+(a?a.name:''),r.note)}});
+ if(ch){save();badge()}},60000);
+
+function remDlg(a){const d=$('#dlg'),mine=S.rem.filter(r=>r.acct===a.id&&!r.done);
+ d.innerHTML=`<h3>תזכורת ל־${esc(a.name)}</h3><form method="dialog" id="rf">
+ <label>תאריך<input name="date" type="date" required value="${addDays(lday(),1)}"></label><label>שעה<input name="time" type="time" value="09:00"></label>
+ <label>תבנית הודעה (לשליחה בלחיצה אחת)<select name="tpl"><option value="">ללא – תזכורת פנימית בלבד</option>${S.tpl.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join('')}</select></label>
+ <label>חזרה<select name="rep"><option value="">חד־פעמית</option><option value="7">כל שבוע</option><option value="14">כל שבועיים</option><option value="30">כל חודש</option></select></label>
+ <label>הערה<input name="note" placeholder="לדוגמה: לברר מועד תשלום"></label>
+ ${mine.length?`<div class="gh">תזכורות פעילות לחשבון</div><div class="card" style="box-shadow:none">${mine.map(r=>`<div class="dc"><div class="n"><b>${heDate(r.date)}${r.time?' · '+esc(r.time):''}</b><small>${esc(r.note||'ללא הערה')}</small></div><button type="button" class="mini" data-rx="${r.id}" aria-label="מחיקה">✕</button></div>`).join('')}</div>`:''}
+ <div class="dl"><button class="btn" value="ok">שמירת תזכורת</button><button class="btn sec" value="x" formnovalidate>ביטול</button></div></form>`;
+ if(!d.open)d.showModal();
+ d.querySelectorAll('[data-rx]').forEach(b=>b.onclick=()=>{S.rem=S.rem.filter(r=>r.id!==b.dataset.rx);save();remDlg(a);badge()});
+ $('#rf').onsubmit=e=>{if(e.submitter?.value!=='ok')return;const f=Object.fromEntries(new FormData($('#rf')));
+  S.rem.push({id:'r'+Date.now(),acct:a.id,date:f.date,time:f.time,note:f.note,tpl:f.tpl,rep:f.rep,done:false});evt('rem',a,{ch:'נוצרה תזכורת',text:heDate(f.date)+(f.time?' '+f.time:'')+(f.note?' – '+f.note:'')});
+  try{if('Notification' in window&&Notification.permission==='default')Notification.requestPermission()}catch(x){}
+  refresh();toast('התזכורת נשמרה')}}
+function remindersDlg(){const d=$('#dlg'),t=lday(),act=S.rem.filter(r=>!r.done).sort((x,y)=>(x.date+(x.time||'')).localeCompare(y.date+(y.time||'')));
+ const it=r=>{const a=S.accts.find(x=>x.id===r.acct);return `<div class="dc"><div class="n"><b>${esc(a?a.name:'חשבון שנמחק')}</b><small>${heDate(r.date)}${r.time?' · '+esc(r.time):''}${r.note?' · '+esc(r.note):''}${r.rep?' · חוזרת':''}</small></div>${r.tpl&&a?`<button class="mini" data-rs="${r.id}" aria-label="שליחה" title="שליחת הודעה">${sm('snd')}</button>`:''}<button class="mini" data-rd="${r.id}" aria-label="בוצע" title="בוצע">✓</button><button class="mini" data-rp="${r.id}" aria-label="דחייה" title="דחייה למחר">${sm('clk')}</button><button class="mini" data-rx="${r.id}" aria-label="מחיקה" title="מחיקה">✕</button></div>`};
+ const grp=(l,L)=>L.length?`<div class="gh">${l} (${L.length})</div><div class="card" style="box-shadow:none">${L.map(it).join('')}</div>`:'';
+ d.innerHTML=`<h3>התזכורות שלי</h3>${act.length?grp('באיחור',act.filter(r=>r.date<t))+grp('להיום',act.filter(r=>r.date===t))+grp('בקרוב',act.filter(r=>r.date>t)):'<div class="empty">אין תזכורות פעילות.<br>אפשר להוסיף תזכורת מתוך כרטיס לקוח או ספק.</div>'}<div class="dl"><button class="btn sec" id="rnt">הפעלת התראות בדפדפן</button><button class="btn sec" id="rcl">סגירה</button></div>`;
+ if(!d.open)d.showModal();
+ const by=id=>S.rem.find(r=>r.id===id),again=()=>{save();badge();remindersDlg()};
+ $('#rcl').onclick=()=>{d.close();refresh()};
+ $('#rnt').onclick=async()=>{try{const p=await Notification.requestPermission();toast(p==='granted'?'ההתראות הופעלו':'ההתראות לא אושרו בדפדפן')}catch(e){toast('הדפדפן לא תומך בהתראות')}};
+ d.querySelectorAll('[data-rd]').forEach(b=>b.onclick=()=>{const r=by(b.dataset.rd);r.done=true;evt('rem',S.accts.find(x=>x.id===r.acct),{ch:'תזכורת סומנה כבוצעה',text:r.note});if(r.rep)S.rem.push({...r,id:'r'+Date.now(),date:addDays(r.date<t?t:r.date,+r.rep),done:false,n:0});again()});
+ d.querySelectorAll('[data-rp]').forEach(b=>b.onclick=()=>{const r=by(b.dataset.rp);r.date=addDays(t,1);r.n=0;again()});
+ d.querySelectorAll('[data-rx]').forEach(b=>b.onclick=()=>{S.rem=S.rem.filter(r=>r.id!==b.dataset.rx);again()});
+ d.querySelectorAll('[data-rs]').forEach(b=>b.onclick=()=>{const r=by(b.dataset.rs),a=S.accts.find(x=>x.id===r.acct);if(a)sendDlg(a,r.tpl)})}
+
+/* ---------- bulk send to overdue customers ---------- */
+function bulkDlg(){const d=$('#dlg'),L=S.accts.filter(a=>a.type==='c').map(a=>({a,ov:ovOf(a)})).filter(x=>x.ov>0).sort((x,y)=>y.ov-x.ov);
+ d.innerHTML=`<h3>שליחה מרוכזת לחייבים בפיגור</h3><p class="hint">בחרו תבנית ושלחו לכל לקוח בלחיצה. כל שליחה נפתחת בנפרד, והלקוח שטופל מסומן.</p><label>תבנית<select id="bt">${S.tpl.map(t=>`<option value="${t.id}" ${t.id==='t1'?'selected':''}>${esc(t.name)}</option>`).join('')}</select></label>
+ ${L.length?`<div class="card" style="margin-top:14px;box-shadow:none">${L.map((x,i)=>{const r=prim(x.a);return `<div class="dc"><div class="n"><b>${esc(x.a.name)}</b><small>${fmt(x.ov)} ₪ בפיגור${r&&r.phone?' · '+esc(r.phone):' · אין טלפון'}</small></div><span class="tag ok" id="bs${i}" hidden>נשלח</span><button class="mini" data-bw="${i}" aria-label="וואטסאפ" ${r&&r.phone?'':'disabled'}>${sm('wa')}</button><button class="mini" data-bm="${i}" aria-label="מייל" ${r&&r.email?'':'disabled'}>${sm('ml')}</button></div>`}).join('')}</div>`:'<div class="empty">אין כרגע לקוחות בפיגור.</div>'}
+ <div class="dl"><button class="btn sec" id="bxl" ${L.length?'':'disabled'}>${I.xl} רשימת גבייה לאקסל</button><button class="btn sec" id="bcl">סגירה</button></div>`;
+ if(!d.open)d.showModal();$('#bcl').onclick=()=>d.close();
+ const tp=()=>S.tpl.find(t=>t.id===$('#bt').value),msg=x=>fillTpl(tp().text,x.a,prim(x.a).c);
+ d.querySelectorAll('[data-bw]').forEach(b=>b.onclick=()=>{const x=L[+b.dataset.bw];openExt(waUrl(prim(x.a).phone,msg(x)),msg(x));logSend(x.a,'וואטסאפ',tp().name,prim(x.a).n);$('#bs'+b.dataset.bw).hidden=false});
+ d.querySelectorAll('[data-bm]').forEach(b=>b.onclick=()=>{const x=L[+b.dataset.bm];logSend(x.a,'מייל',tp().name,prim(x.a).n);$('#bs'+b.dataset.bm).hidden=false;openExt(`mailto:${prim(x.a).email}?subject=${encodeURIComponent(x.a.name)}&body=${encodeURIComponent(msg(x))}`,msg(x))});
+ $('#bxl')&&($('#bxl').onclick=()=>{if(!window.XLSX)return toast('ספריית האקסל לא נטענה');const wb=XLSX.utils.book_new();wb.Workbook={Views:[{RTL:true}]};
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['מספר','שם','טלפון','דוא"ל','יתרה','חוב בפיגור'],...L.map(x=>[x.a.id,x.a.name,prim(x.a).phone||'',prim(x.a).email||'',bal(x.a),x.ov])]),'גבייה');XLSX.writeFile(wb,'רשימת-גבייה.xlsx')})}
+
+/* ---------- contacts (add / edit) ---------- */
+function contactDlg(a,i){const ed=i!=null&&a.contacts&&a.contacts[i],c=ed?a.contacts[i]:{name:'',role:'',phone:'',email:''},d=$('#dlg');
+ d.innerHTML=`<h3>${ed?'עריכת איש קשר':'איש קשר חדש'}</h3><form method="dialog" id="cf"><label>שם<input name="name" required value="${esc(c.name)}"></label><label>תפקיד<input name="role" placeholder="לדוגמה: הנהלת חשבונות" value="${esc(c.role||'')}"></label><label>טלפון (וואטסאפ ו־SMS)<input name="phone" type="tel" inputmode="tel" required value="${esc(c.phone||'')}"></label><label>דוא"ל<input name="email" type="email" value="${esc(c.email||'')}"></label><div class="dl"><button class="btn" value="ok">שמירה</button><button class="btn sec" value="x" formnovalidate>ביטול</button></div></form>`;if(!d.open)d.showModal();
+ $('#cf').onsubmit=e=>{if(e.submitter?.value!=='ok')return;const o=Object.fromEntries(new FormData($('#cf')));if(ed)a.contacts[i]=o;else(a.contacts=a.contacts||[]).push(o);save();renderDetail()}}
+
+/* ---------- new transaction ---------- */
+function txDlg(a,p){p=p||{};const sup=a.type==='s',d=$('#dlg');
+ d.innerHTML=`<h3>תנועה חדשה – ${esc(a.name)}</h3><form method="dialog" id="tf"><label>סוג תנועה<select name="k"><option value="inv">${sup?'חשבונית ספק':'חשבונית מס / חיוב'}</option><option value="pay">${sup?'תשלום לספק':'קבלה / תקבול'}</option><option value="cn">זיכוי</option></select></label><label>סכום<input name="amt" type="number" step="0.01" min="0.01" required value="${p.amt||''}"></label><label>תאריך<input name="d" type="date" required value="${esc(p.date||lday())}"></label><label>תאריך פרעון (לא חובה)<input name="due" type="date"></label><label>אסמכתא<input name="ref" value="${esc(p.ref||'')}"></label><label>פרטים<input name="desc" placeholder="תיאור התנועה"></label><p class="hint">התנועה תסומן כחדשה, ותיכלל ביצוא הבא לחשבשבת.</p><div class="dl"><button class="btn" value="ok">שמירה</button><button class="btn sec" value="x" formnovalidate>ביטול</button></div></form>`;
+ if(!d.open)d.showModal();
+ $('#tf').onsubmit=e=>{if(e.submitter?.value!=='ok')return;const f=Object.fromEntries(new FormData($('#tf'))),v=+f.amt||0,lb={inv:sup?'חשבונית ספק':'חשבונית מס',pay:sup?'תשלום':'קבלה',cn:'זיכוי'}[f.k],deb=f.k==='inv'?!sup:sup;
+  if(!a.tx.length&&a.balance)a.tx.push({d:lday(),ref:'',desc:'יתרת פתיחה',debit:a.balance>0?a.balance:0,credit:a.balance<0?-a.balance:0,due:lday()});
+  a.tx.push({d:f.d,ref:f.ref,desc:f.desc||lb,debit:deb?v:0,credit:deb?0:v,due:f.due||(f.k==='inv'?'':f.d),app:1,k:f.k});evt('tx',a,{ch:'נרשמה תנועה',text:(f.desc||lb)+' · '+fmt(v)});save();V.dt='led';renderDetail();toast('התנועה נרשמה')}}
+
+/* ---------- documents: upload / scan / OCR / send ---------- */
+const DB=new Promise((res,rej)=>{try{const q=indexedDB.open('hs_files',1);q.onupgradeneeded=()=>q.result.createObjectStore('f',{keyPath:'id'});q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)}catch(e){rej(e)}});DB.catch(()=>{});
+const dbx=async(m,fn)=>{const db=await DB;return new Promise((res,rej)=>{const t=db.transaction('f',m),r=fn(t.objectStore('f'));t.oncomplete=()=>res(r&&r.result);t.onerror=()=>rej(t.error)})};
+const fPut=f=>dbx('readwrite',s=>s.put(f)),fDel=id=>dbx('readwrite',s=>s.delete(id)),fAll=()=>dbx('readonly',s=>s.getAll());
+const CATS=['חשבונית','קבלה','הצעת מחיר','תעודת משלוח','חוזה','סריקה','אחר'];
+async function saveFile(a,file,cat,ocr){const f={id:'f'+Date.now()+Math.random().toString(36).slice(2,6),u:U,acct:a.id,name:file.name||('סריקה-'+lday()+'.jpg'),type:file.type||'',size:file.size,d:lday(),cat:cat||'אחר',ocr:ocr||'',blob:file};await fPut(f);evt('file',a,{ch:'קובץ הועלה',text:f.name});return f}
+function pickFile(a,scan){const i=document.createElement('input');i.type='file';
+ if(scan){i.accept='image/*';i.setAttribute('capture','environment')}else{i.accept='.pdf,.png,.jpg,.jpeg,.webp,.doc,.docx,.xls,.xlsx,.csv,.txt';i.multiple=true}
+ i.onchange=async()=>{const F=[...i.files];if(!F.length)return;
+  if(scan)return ocrDlg(a,F[0]);
+  try{for(const f of F)await saveFile(a,f,/image/.test(f.type)?'סריקה':'אחר');V.dt='fil';renderDetail();toast(F.length>1?`${F.length} קבצים נשמרו`:'הקובץ נשמר')}catch(e){toast('לא ניתן לשמור קבצים בדפדפן זה')}};
+ i.click()}
+const urls={};const thumb=f=>urls[f.id]||(urls[f.id]=URL.createObjectURL(f.blob));
+function dlBlob(f){const u=URL.createObjectURL(f.blob),x=document.createElement('a');x.href=u;x.download=f.name;x.click();setTimeout(()=>URL.revokeObjectURL(u),5000)}
+function fileRow(f,showAcct){const a=S.accts.find(x=>x.id===f.acct),img=/^image\//.test(f.type);
+ return `<div class="dc"><${img?`img class="thumb" src="${thumb(f)}" alt=""`:`span class="ic">${I.pdf}</span`}${img?'>':''}<div class="n"><b>${esc(f.name)}</b><small>${showAcct&&a?esc(a.name)+' · ':''}${esc(f.cat)} · ${heDate(f.d)} · ${kb(f.size)}</small></div><button class="mini" data-fv="${f.id}" aria-label="צפייה" title="צפייה">${sm('eye')}</button><button class="mini" data-fs="${f.id}" aria-label="שליחה" title="שליחה">${sm('snd')}</button><button class="mini" data-fm="${f.id}" aria-label="עוד" title="עוד">⋯</button></div>`}
+function bindFiles(box,L){const by=id=>L.find(f=>f.id===id),acctOf=f=>S.accts.find(x=>x.id===f.acct);
+ box.querySelectorAll('[data-fv]').forEach(b=>b.onclick=()=>{const f=by(b.dataset.fv),u=URL.createObjectURL(f.blob);window.open(u,'_blank')||dlBlob(f)});
+ box.querySelectorAll('[data-fs]').forEach(b=>b.onclick=()=>{const f=by(b.dataset.fs);shareFileDlg(acctOf(f),f)});
+ box.querySelectorAll('[data-fm]').forEach(b=>b.onclick=()=>fileMenu(by(b.dataset.fm),acctOf(by(b.dataset.fm))))}
+function fileMenu(f,a){const d=$('#dlg');
+ d.innerHTML=`<h3>${esc(f.name)}</h3><p class="hint">${esc(f.cat)} · ${heDate(f.d)} · ${kb(f.size)}</p>${f.ocr?`<label>טקסט שזוהה<textarea rows="4" readonly>${esc(f.ocr)}</textarea></label>`:''}<label>סוג מסמך<select id="fct">${CATS.map(c=>`<option ${c===f.cat?'selected':''}>${c}</option>`).join('')}</select></label>
+ <div class="dl"><button class="btn" id="fsv">שמירת סוג</button><button class="btn sec" id="fdl">${sm('dl')} הורדה</button>${/^image\//.test(f.type)?`<button class="btn sec" id="foc">זיהוי טקסט</button>`:''}<button class="btn danger" id="fdx">מחיקה</button><button class="btn sec" id="fcl">סגירה</button></div>`;
+ if(!d.open)d.showModal();$('#fcl').onclick=()=>d.close();$('#fdl').onclick=()=>dlBlob(f);
+ $('#fsv').onclick=async()=>{f.cat=$('#fct').value;await fPut(f);d.close();refreshFiles()};
+ $('#foc')&&($('#foc').onclick=()=>ocrDlg(a,f));
+ $('#fdx').onclick=async()=>{if(confirm('למחוק את הקובץ?')){await fDel(f.id);evt('file',a,{ch:'קובץ נמחק',text:f.name});d.close();refreshFiles();toast('הקובץ נמחק')}}}
+const refreshFiles=()=>{if($('#fl'))fillFiles(cur());else if(V.open)renderDetail()};
+async function fillFiles(a){const box=$('#fl');if(!box||!a)return;let L=[];
+ try{L=(await fAll()).filter(f=>f.u===U&&f.acct===a.id).sort((x,y)=>y.id.localeCompare(x.id))}catch(e){box.innerHTML='<div class="empty">אחסון הקבצים אינו זמין בדפדפן זה.</div>';return}
+ box.innerHTML=L.length?`<div class="card">${L.map(f=>fileRow(f)).join('')}</div>`:'<div class="empty">עדיין אין קבצים בחשבון.<br>אפשר להעלות מסמך או לצלם ולסרוק.</div>';bindFiles(box,L)}
+async function docsCenter(){const d=$('#dlg');let L=[];try{L=(await fAll()).filter(f=>f.u===U).sort((x,y)=>y.id.localeCompare(x.id))}catch(e){}
+ d.innerHTML=`<h3>מרכז מסמכים</h3><p class="hint">${L.length} קבצים · ${kb(L.reduce((s,f)=>s+f.size,0))}. להעלאת מסמך חדש יש להיכנס לכרטיס הלקוח או הספק.</p><div class="search" style="height:46px">${I.srch}<input id="dq" type="search" placeholder="חיפוש לפי שם קובץ, לקוח או סוג"></div><div id="dl2" style="margin-top:12px"></div><div class="dl"><button class="btn sec" id="dcl">סגירה</button></div>`;
+ if(!d.open)d.showModal();$('#dcl').onclick=()=>d.close();
+ const draw=()=>{const q=$('#dq').value.trim().toLowerCase(),M=L.filter(f=>{const a=S.accts.find(x=>x.id===f.acct);return(f.name+' '+f.cat+' '+(a?a.name:'')).toLowerCase().includes(q)});
+  $('#dl2').innerHTML=M.length?`<div class="card" style="box-shadow:none">${M.map(f=>fileRow(f,true)).join('')}</div>`:'<div class="empty">לא נמצאו קבצים.</div>';bindFiles($('#dl2'),M)};
+ $('#dq').oninput=draw;draw()}
+function shareFileDlg(a,f){const d=$('#dlg'),R=recipients(a);
+ d.innerHTML=`<h3>שליחת מסמך</h3><div class="card" style="box-shadow:none"><div class="dc"><span class="ic">${I.pdf}</span><div class="n"><b>${esc(f.name)}</b><small>${esc(f.cat)} · ${kb(f.size)}</small></div></div></div><label>נמען<select id="fr">${R.map((r,i)=>`<option value="${i}">${esc(r.n)}${r.phone?' · '+esc(r.phone):''}</option>`).join('')}</select></label><label>הודעה נלווית<textarea id="fm2" rows="4"></textarea></label><p class="hint">בטלפון נפתח חלון השיתוף של המכשיר עם הקובץ עצמו. במחשב הקובץ יורד ואז מצרפים אותו להודעה.</p><div class="dl"><button class="btn" id="fsh">שיתוף</button><button class="btn sec" id="fwa">וואטסאפ</button><button class="btn sec" id="fml">מייל</button><button class="btn sec" id="fcl">סגירה</button></div>`;
+ if(!d.open)d.showModal();const cr=()=>R[$('#fr').value],setM=()=>{$('#fm2').value=`שלום ${cr().c||a.name},\nמצורף ${f.cat}: ${f.name}\n${S.name}`};setM();$('#fr').onchange=setM;$('#fcl').onclick=()=>d.close();
+ $('#fsh').onclick=async()=>{const file=new File([f.blob],f.name,{type:f.type||'application/octet-stream'});
+  if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],text:$('#fm2').value});logSend(a,'שיתוף',f.name,cr().n,'file')}catch(e){}}else{dlBlob(f);toast('השיתוף הישיר לא נתמך כאן. הקובץ ירד, צרפו אותו להודעה')}};
+ $('#fwa').onclick=()=>{dlBlob(f);openExt(waUrl(cr().phone,$('#fm2').value),$('#fm2').value);logSend(a,'וואטסאפ',f.name,cr().n,'file');toast('הקובץ ירד, צרפו אותו בשיחה')};
+ $('#fml').onclick=()=>{dlBlob(f);logSend(a,'מייל',f.name,cr().n,'file');setTimeout(()=>{openExt(`mailto:${cr().email||''}?subject=${encodeURIComponent(f.cat+' - '+a.name)}&body=${encodeURIComponent($('#fm2').value)}`,$('#fm2').value)},400)}}
+let _tess;const loadTess=()=>_tess||(_tess=new Promise((res,rej)=>{if(window.Tesseract)return res();const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';s.onload=res;s.onerror=()=>{_tess=null;rej()};document.head.appendChild(s)}));
+function ocrParse(t){const T=String(t||''),nums=[...T.matchAll(/(\d{1,3}(?:,\d{3})*\.\d{1,2}|\d+\.\d{2})/g)].map(m=>({v:parseFloat(m[1].replace(/,/g,'')),i:m.index})),kw=/(סה["״']?כ|לתשלום|total|סכום)/i;
+ let amt=0;for(const n of nums){if(kw.test(T.slice(Math.max(0,n.i-30),n.i))){amt=n.v;break}}if(!amt&&nums.length)amt=Math.max(...nums.map(n=>n.v));
+ const dm=T.match(/(\d{1,2})[./-](\d{1,2})[./-](\d{2,4})/),date=dm?`${dm[3].length===2?'20'+dm[3]:dm[3]}-${dm[2].padStart(2,'0')}-${dm[1].padStart(2,'0')}`:lday(),rm=T.match(/(?:חשבונית|אסמכתא|מספר|מס['׳]?|no\.?|#)\s*[:\-]?\s*(\d{3,})/i);
+ return{amt:amt||'',date,ref:rm?rm[1]:''}}
+function ocrDlg(a,src){const d=$('#dlg'),isF=src instanceof File,blob=isF?src:src.blob,u=URL.createObjectURL(blob);
+ d.innerHTML=`<h3>סריקה וזיהוי טקסט</h3><img src="${u}" alt="" style="width:100%;max-height:220px;object-fit:contain;border-radius:16px;background:var(--tile)"><p class="hint" id="ost">מזהה טקסט… בפעם הראשונה נטענת ספריית הזיהוי.</p><div class="prog"><i id="opb"></i></div><label>הטקסט שזוהה (אפשר לערוך)<textarea id="otx" rows="6"></textarea></label><div class="dl"><button class="btn" id="osv">${isF?'שמירה בקבצים':'עדכון הטקסט'}</button><button class="btn sec" id="otr">הוספת תנועה מהמסמך</button><button class="btn sec" id="ocp">העתקה</button><button class="btn sec" id="ocl">סגירה</button></div>`;
+ if(!d.open)d.showModal();$('#ocl').onclick=()=>d.close();
+ (async()=>{try{await loadTess();const r=await Tesseract.recognize(blob,'heb+eng',{logger:m=>{if(m.status==='recognizing text'&&$('#opb'))$('#opb').style.width=Math.round(m.progress*100)+'%'}});if($('#otx')){$('#otx').value=r.data.text.trim();$('#ost').textContent='הזיהוי הסתיים. בדקו את הטקסט ואשרו.'}}catch(e){if($('#ost'))$('#ost').textContent='לא ניתן היה לזהות טקסט (נדרש חיבור לאינטרנט). אפשר לשמור את הקובץ בכל זאת.'}})();
+ $('#osv').onclick=async()=>{try{if(isF){await saveFile(a,src,'סריקה',$('#otx').value);V.dt='fil'}else{src.ocr=$('#otx').value;await fPut(src)}d.close();renderDetail();toast('נשמר')}catch(e){toast('לא ניתן לשמור קבצים בדפדפן זה')}};
+ $('#otr').onclick=()=>txDlg(a,ocrParse($('#otx').value));
+ $('#ocp').onclick=()=>{navigator.clipboard?.writeText($('#otx').value).then(()=>toast('הועתק'),()=>toast('לא ניתן להעתיק'))}}
+
+/* ---------- export to Hashavshevet ---------- */
+function hsBuild(scope,onlyNew,B,Inc){const rows=[],refs=[];
+ scope.forEach(x=>x.tx.forEach(t=>{if(onlyNew&&(!t.app||t.x))return;const dr=+t.debit||0,cr=+t.credit||0,v=dr-cr;if(!v)return;
+  const isPay=x.type==='s'?dr>0:cr>0,cp=(t.k==='cn'||!isPay)?Inc:B,dd=heDate(t.d).replace(/\./g,'/');
+  rows.push(v>0?[dd,dd,t.ref||'',x.id,cp,v,t.desc||'']:[dd,dd,t.ref||'',cp,x.id,-v,t.desc||'']);refs.push(t)}));
+ return{rows,refs}}
+function hsDlg(a){const d=$('#dlg'),s=S.set;
+ d.innerHTML=`<h3>יצוא לחשבשבת</h3><p class="hint">יוצר קובץ תנועות (פקודות יומן) לקליטה בחשבשבת. בכל שורה יש חשבון חובה וחשבון זכות, ולכן צריך להזין את החשבונות הנגדיים. אם בחשבשבת שלכם הוגדר מבנה קליטה אחר, אפשר להתאים את סדר העמודות בקובץ.</p>
+ <label>היקף<select id="hsc"><option value="all">כל החשבונות</option>${a?`<option value="one" selected>${esc(a.name)} בלבד</option>`:''}</select></label>
+ <label>אילו תנועות<select id="hsw"><option value="new">רק תנועות שנרשמו באפליקציה ועדיין לא יוצאו</option><option value="all">כל התנועות</option></select></label>
+ <label>חשבון בנק / קופה (לקבלות ותשלומים)<input id="hsb" inputmode="numeric" value="${esc(s.cp||'')}"></label><label>חשבון הכנסות / הוצאות (לחשבוניות וזיכויים)<input id="hsi" inputmode="numeric" value="${esc(s.ci||'')}"></label>
+ <label>פורמט<select id="hsf"><option value="xlsx">Excel‏ (.xlsx)</option><option value="csv">CSV</option><option value="txt">טקסט עם טאבים</option></select></label><p class="hint" id="hsn"></p>
+ <div class="dl"><button class="btn" id="hsg">${sm('dl')} יצירת קובץ</button><button class="btn sec" id="hsx">סגירה</button></div>`;
+ if(!d.open)d.showModal();$('#hsx').onclick=()=>d.close();
+ const build=()=>hsBuild($('#hsc').value==='one'&&a?[a]:S.accts,$('#hsw').value==='new',$('#hsb').value.trim(),$('#hsi').value.trim()),cnt=()=>{$('#hsn').textContent=`${build().rows.length} שורות מוכנות ליצוא.`};
+ ['hsc','hsw','hsb','hsi'].forEach(i=>$('#'+i).addEventListener('input',cnt));cnt();
+ $('#hsg').onclick=()=>{const B=$('#hsb').value.trim(),Inc=$('#hsi').value.trim();if(!B||!Inc)return toast('יש להזין את שני החשבונות הנגדיים');
+  const {rows,refs}=build();if(!rows.length)return toast('אין תנועות ליצוא');S.set.cp=B;S.set.ci=Inc;
+  const H=['תאריך ערך','תאריך אסמכתא','אסמכתא','חשבון חובה','חשבון זכות','סכום','פרטים'],f=$('#hsf').value,nm='יצוא-לחשבשבת-'+lday(),tsv=[H,...rows].map(r=>r.join('\t')).join('\n');
+  const gen=()=>{if(f==='xlsx'){if(!window.XLSX)return toast('ספריית האקסל לא נטענה');const wb=XLSX.utils.book_new();wb.Workbook={Views:[{RTL:true}]};XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([H,...rows]),'תנועות');XLSX.writeFile(wb,nm+'.xlsx')}
+   else{const sep=f==='csv'?',':'\t',q=v=>{v=String(v);return f==='csv'&&/[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v},txt='\ufeff'+[H,...rows].map(r=>r.map(q).join(sep)).join('\r\n'),x=document.createElement('a');x.href=URL.createObjectURL(new Blob([txt],{type:'text/'+(f==='csv'?'csv':'plain')+';charset=utf-8'}));x.download=nm+(f==='csv'?'.csv':'.txt');document.body.appendChild(x);x.click();x.remove()}};
+  if($('#hsw').value==='new')refs.forEach(t=>t.x=1);
+  evt('exp',a,{ch:'יצוא לחשבשבת',text:`${rows.length} שורות · ${f==='xlsx'?'Excel':f.toUpperCase()}`});
+  d.innerHTML=`<h3>הקובץ מוכן</h3><p class="hint">${rows.length} שורות. אם ההורדה לא התחילה, אפשר ללחוץ שוב על "הורדה", או להעתיק ולהדביק ישירות באקסל.</p><label>תצוגה מקדימה<textarea id="hsp" rows="7" readonly></textarea></label><div class="dl"><button type="button" class="btn" id="hsd">${sm('dl')} הורדה</button><button type="button" class="btn sec" id="hsc2">העתקה לאקסל</button><button type="button" class="btn sec" id="hsk">סגירה</button></div>`;
+  $('#hsp').value=tsv;$('#hsd').onclick=gen;$('#hsc2').onclick=()=>{copyTxt(tsv);toast('הועתק, אפשר להדביק באקסל')};$('#hsk').onclick=()=>{d.close();refresh()};gen()}}
+
+/* ---------- tools menu ---------- */
+function toolsDlg(){const d=$('#dlg'),b=[['rm',I.bell,'תזכורות'],['bk',I.snd,'שליחה מרוכזת לחייבים'],['hs',I.hs,'יצוא לחשבשבת'],['dc',I.pdf,'מרכז מסמכים'],['lg',I.clk,'יומן אירועים'],['tp',I.ml,'הודעות מובנות'],['ea',I.xl,'ייצוא הכל לאקסל'],['im',I.up,'ייבוא מחשבשבת'],['us',I.usr,'משתמש וגיבוי']];
+ d.innerHTML=`<h3>כלים</h3><div class="tg">${b.map(([k,i,l])=>`<button class="act" data-tk="${k}">${i}${l}</button>`).join('')}</div><div class="dl"><button class="btn sec" id="tcl2">סגירה</button></div>`;
+ if(!d.open)d.showModal();$('#tcl2').onclick=()=>d.close();
+ const M={rm:remindersDlg,bk:bulkDlg,hs:()=>hsDlg(null),dc:docsCenter,lg:()=>logDlg(),tp:()=>tplDlg(),ea:()=>{d.close();exportAll()},im:importDlg,us:userDlg};
+ d.querySelectorAll('[data-tk]').forEach(x=>x.onclick=()=>M[x.dataset.tk]())}
+document.addEventListener('click',e=>{const t=e.target;
+ if(t.closest('#bl'))return remindersDlg();
+ if(t.closest('#tls'))return toolsDlg();
+ const q=t.closest('[data-q]');if(q)return({rm:remindersDlg,bk:bulkDlg,hs:()=>hsDlg(null),dc:docsCenter,lg:()=>logDlg()})[q.dataset.q]();
+ if(t.closest('[data-lg]'))return logDlg(cur());const ce=t.closest('[data-ce]');if(ce)return contactDlg(cur(),+ce.dataset.ce)});
+$('#dlg').addEventListener('close',badge);
+/* ---------- event log, safe dialogs, external opening ---------- */
+function evt(type,a,o){o=o||{};S.log.unshift({type,acct:a?a.id:'',d:lday(),ts:Date.now(),ch:o.ch||'',tpl:o.tpl||'',to:o.to||'',text:o.text||''});S.log=S.log.slice(0,2000);save()}
+const logSend=(a,ch,tpl,to,type)=>evt(type||'msg',a,{ch:type==='file'?'קובץ נשלח · '+ch:ch,tpl:type==='file'?'':tpl,to,text:type==='file'?tpl:''});
+const EVI={msg:'snd',rem:'bell',file:'pdf',tx:'db',exp:'hs',imp:'up',acct:'usr'},EVG={msg:['msg'],rem:['rem'],file:['file'],tx:['tx'],exp:['exp','imp']};
+const hhmm=x=>x.ts?new Date(x.ts).toTimeString().slice(0,5):'';
+function evRow(x,showAcct){const a=S.accts.find(y=>y.id===x.acct),ty=x.type||'msg',title=esc(x.ch||'הודעה')+(x.to?' ל־'+esc(x.to):''),
+ sub=[showAcct&&a?esc(a.name):'',x.tpl?esc(x.tpl):'',ty!=='msg'&&x.text?esc(x.text):''].filter(Boolean).join(' · ');
+ return `<div class="dc"><span class="ic" style="width:38px;height:38px;border-radius:12px">${sm(EVI[ty]||'snd')}</span><div class="n"><b style="font-size:15px">${title}</b><small>${heDate(x.d)}${hhmm(x)?' · '+hhmm(x):''}${sub?' · '+sub:''}</small></div></div>`}
+function logDlg(a0){const d=$('#dlg');let flt='all';
+ d.innerHTML=`<h3>יומן אירועים${a0?' – '+esc(a0.name):''}</h3><div class="row" id="lgc">${[['all','הכל'],['msg','הודעות'],['rem','תזכורות'],['file','מסמכים'],['tx','תנועות'],['exp','יצוא וייבוא']].map(([k,l])=>`<button class="chip ${k==='all'?'on':''}" data-k="${k}">${l}</button>`).join('')}</div><div class="search" style="height:46px">${I.srch}<input id="lq" type="search" placeholder="חיפוש לפי שם, תבנית או תוכן"></div><div id="lgl" style="margin-top:12px"></div><p class="hint">שליחה נרשמת ברגע הלחיצה על כפתור השליחה.</p><div class="dl"><button class="btn sec" id="lcp">העתקת היומן</button><button class="btn sec" id="lcl">סגירה</button></div>`;
+ if(!d.open)d.showModal();$('#lcl').onclick=()=>d.close();
+ const nm=x=>(S.accts.find(y=>y.id===x.acct)||{}).name||'',get=()=>{const q=$('#lq').value.trim().toLowerCase();return S.log.filter(x=>(!a0||x.acct===a0.id)&&(flt==='all'||(EVG[flt]||[]).includes(x.type||'msg'))&&(!q||[x.ch,x.to,x.tpl,x.text,nm(x)].join(' ').toLowerCase().includes(q)))};
+ const draw=()=>{const L=get().slice(0,300);$('#lgl').innerHTML=L.length?`<div class="card" style="box-shadow:none">${L.map(x=>evRow(x,!a0)).join('')}</div>`:'<div class="empty">אין אירועים להצגה.<br>כל שליחה, תזכורת, מסמך ותנועה יירשמו כאן.</div>'};
+ $('#lgc').onclick=e=>{const b=e.target.closest('[data-k]');if(!b)return;flt=b.dataset.k;$('#lgc').querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c===b));draw()};$('#lq').oninput=draw;draw();
+ $('#lcp').onclick=()=>{copyTxt(get().map(x=>[heDate(x.d),hhmm(x),x.ch,x.to||'',nm(x),x.tpl||x.text||''].join('\t')).join('\n'));toast('היומן הועתק, אפשר להדביק באקסל')}}
+function copyTxt(t){const fb=()=>{const x=document.createElement('textarea');x.value=t;document.body.appendChild(x);x.select();try{document.execCommand('copy')}catch(e){}x.remove()};try{navigator.clipboard.writeText(t).catch(fb)}catch(e){fb()}}
+function openExt(url,text){const web=/^https?:/.test(url);let w=null;try{if(web)w=window.open(url,'_blank');else location.href=url}catch(e){}
+ if(web&&w)return;copyTxt(text||'');if(!web)return toast('אם לא נפתחה אפליקציה, ההודעה הועתקה ואפשר להדביק');extDlg(url,text)}
+function extDlg(url,text){const d=$('#dlg');d.innerHTML=`<h3>פתיחת וואטסאפ</h3><p class="hint">הדפדפן חסם פתיחה אוטומטית. ההודעה הועתקה, אפשר ללחוץ על הקישור או להדביק ידנית.</p><label>ההודעה<textarea rows="5" readonly>${esc(text)}</textarea></label><div class="dl"><a class="btn" href="${esc(url)}" target="_blank" rel="noopener">פתיחה בוואטסאפ</a><button type="button" class="btn sec" id="xcp">העתקה</button><button type="button" class="btn sec" id="xcl">סגירה</button></div>`;
+ if(!d.open)d.showModal();$('#xcl').onclick=()=>d.close();$('#xcp').onclick=()=>{copyTxt(text);toast('הועתק')}}
+/* dialog forms are handled in JS, so buttons work even where native form submission is blocked */
+$('#dlg').addEventListener('click',e=>{const b=e.target.closest('button'),f=b&&b.form;if(!f||!f.closest('dialog')||b.type==='button')return;e.preventDefault();const d=$('#dlg');
+ if(b.value==='ok'){if(!f.reportValidity())return;if(f.onsubmit)f.onsubmit({submitter:b,preventDefault(){}});d.close()}else d.close()},true);
+$('#dlg').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches('input')&&e.target.form){const ok=e.target.form.querySelector('button[value=ok]');if(ok){e.preventDefault();ok.click()}}});
+$('#dlg').addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.close()});
+(function(){const k=Object.keys(users()),s=localStorage.getItem('hs_sess');U=(s&&users()[s]?s:k[0])||'me';load();renderList();maybeNotify()})();
+</script>
+</body>
+</html>
